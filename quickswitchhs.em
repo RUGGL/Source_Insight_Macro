@@ -15,6 +15,7 @@
 20260104_0222 相对绝对路径的判断，独立成函数，判断正常运行
 20260104_0229 注释掉过程调试信息弹窗，运行正常
 20260104_0238 进行一些边边角角的修改
+20260104_1059 修改路径判断的位置,只有匹配成功之后才判断,避免每次匹配都判断
 ***********************************************************************************/
 
 
@@ -22,19 +23,31 @@
 
 macro QuickSwitchHS()
 {
-    version="20260104_0238"
-    // Msg("调试输出:当前版本号 @version@")
+    version="20260104_1019"
+    Msg("调试输出:当前版本号 @version@")
     //获取当前打开buffer的句柄
-    CurrentBuf = GetCurrentBuf()
+    CurrentBuf = GetCurrentBuf()   
     if (CurrentBuf == hNil)
         stop
-
-   
-    curOpenFileName = GetBufName(CurrentBuf) //无论项目设置的源代码根目录在哪里,这个宏返回的都是当前buffer文件的绝对路径
-    
+    curOpenFileName = GetBufName(CurrentBuf) //获取当前窗口的文件名
+    //无论项目设置的源代码根目录在哪里,这个宏返回的都是当前buffer文件的绝对路径
     if (curOpenFileName == "")
         stop 
-        
+
+    CurrentProj = GetCurrentProj()      //根据官方文档,句柄不能作为全局变量
+    if (CurrentProj == hNil){
+        Msg("获取当前项目失败")
+        stop
+    }else{
+        ProjName = GetProjName (CurrentProj)
+        ifileMax = GetProjFileCount (CurrentProj)
+        ProjSourceDir=GetProjDir (CurrentProj)  //获取项目设置的源代码路径,不是项目保存的路径
+
+    }
+
+    
+    Msg("获取当前项目名称为:@ProjName@,项目源代码路径为:@ProjSourceDir@,句柄为@CurrentProj@,包含@ifileMax@个文件")
+    
     
     // 头文件类型后缀名列表
     hExtList = NewBuf("hExtList") 
@@ -96,10 +109,10 @@ macro QuickSwitchHS()
         }
         i = i - 1
     }
-    // Msg("当前打开的文件为:文件路径:@curOpenFileName@,文件名:@basename@,文件拓展名:@ext@ ")
+    Msg("当前打开的文件为:文件路径:@curOpenFileName@,文件名:@basename@,文件拓展名:@ext@ ")
     if (ext == "") //basename == "" || 
     {
-        // Msg("当前文件无扩展名: @fname@")
+        Msg("当前文件无扩展名: @fname@")
         CloseBuf(hExtList) // 关闭缓冲区 
         CloseBuf(cExtList)
         stop
@@ -127,19 +140,19 @@ macro QuickSwitchHS()
       if (isHeader == 1)
     {
         // 当前是头文件 -> 目标为源文件
-        // Msg("后缀名为:@ext@, 当前是头文件 -> 目标为源文件,正在查找对应的源文件...")
+        Msg("后缀名为:@ext@, 当前是头文件 -> 目标为源文件,正在查找对应的源文件...")
         targetExtList=cExtList
         
     }
     else if (isSource == 1)
     {
         // 当前是源文件 -> 目标为头文件
-        // Msg("后缀名为:@ext@, 当前是源文件 -> 目标为头文件,正在查找对应的头文件...")
+        Msg("后缀名为:@ext@, 当前是源文件 -> 目标为头文件,正在查找对应的头文件...")
         targetExtList=hExtList
     }
     else
     {
-        // Msg("当前不是C/C++头文件或源文件: .@ext@")
+        Msg("当前不是C/C++头文件或源文件: .@ext@")
         
         CloseBuf(hExtList) // 关闭缓冲区 
         CloseBuf(cExtList)
@@ -149,20 +162,38 @@ macro QuickSwitchHS()
     // --- 4. 在项目范围搜索对应的匹配文件 ---
     foundFile = ""
     
-    // Msg("在项目范围搜索...")
+    Msg("在项目范围搜索...")
     foundFile = SearchInProject(basename, targetExtList)
 
 
     // --- 5. 处理查找结果 ---
     if (foundFile !="")
     {
-        // 5.1 打开或切换到目标文件
+        // 5.1 判断是否为相对路径
+        IsRelative=IsRelativePath(foundFile) //判断是否为相对路径
+        
+         if(IsRelative){
+        
+            Msg("宏返回当前测试文件路径为相对路径,需手动构造绝对路径,构造前路径:@foundFile@")
+            foundFile=cat(ProjSourceDir,cat("\\",foundFile))
+            
+            Msg("构造绝对路径后,测试文件路径:@foundFile@")
+            
+        }else{
+            Msg("宏返回当前测试文件为绝对路径:@foundFile@")
+        }
+
+        //5.2 打开或切换到目标文件
+        //以绝对路径尝试打开匹配到的文件
         OpenOrSwitch(foundFile)
     }
     else
     {
-        // Msg("未找到匹配文件")
+        Msg("未找到匹配文件")
     }
+
+    // --- 6. 关闭打开的后缀名列表buffer ---
+
     CloseBuf(hExtList) // 关闭缓冲区 
     CloseBuf(cExtList)
     stop
@@ -172,43 +203,28 @@ macro QuickSwitchHS()
 // 在项目范围内查找
 Function SearchInProject(basename, targetExtList)
 {
-    // Msg("开始匹配文件名:@Basename@")
+    Msg("开始匹配文件名:@Basename@")
     foundFile = ""
-    CurrentProj = GetCurrentProj()
-    
-    if (CurrentProj == hNil){ //不确定是用stop还是return返回值
-        // Msg("获取当前项目失败")
-        return foundFile
+    CurrentProj = GetCurrentProj()      //根据官方文档,句柄不能作为全局变量
+    if (CurrentProj == hNil){
+        Msg("获取当前项目失败")
+        stop
     }else{
         ProjName = GetProjName (CurrentProj)
         ifileMax = GetProjFileCount (CurrentProj)
+        ProjSourceDir=GetProjDir (CurrentProj)  //获取项目设置的源代码路径,不是项目保存的路径
 
-        ProjSourceDir=GetProjDir (CurrentProj)  //项目设置的源代码路径,不是项目保存的路径
-        // Msg("获取当前项目名称为:@ProjName@,项目源代码路径为:@ProjSourceDir@,句柄为@CurrentProj@,包含@ifileMax@个文件")
-        
     }
+
     
-   
     i = 0
     projFile = GetProjFileName (CurrentProj, i)
-    IsRelative=IsRelativePath(projFile) //判断是否为相对路径
-    
     while (i < ifileMax)
     {
         projFile = GetProjFileName (CurrentProj, i)
         
-        if(IsRelative){
-        
-            // Msg("宏返回当前测试文件路径为相对路径,需手动构造绝对路径,构造前路径:@projFile@")
-            projFile=cat(ProjSourceDir,cat("\\",projFile))
-            
-            // Msg("构造绝对路径后,测试文件路径:@projFile@")
-            
-        }else{
-            // Msg("宏返回当前测试文件为绝对路径:@projFile@")
-        }
+        Msg("当前宏返回的测试文件路径为:@projFile@")
 
-        
         // 提取文件名
         projFileName = ExtractFileName(projFile)
         
@@ -228,25 +244,25 @@ Function SearchInProject(basename, targetExtList)
             j = j - 1
         }
         
-        // Msg("文件名拆分完成,开始匹配:文件路径:@projFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
+        Msg("文件名拆分完成,开始匹配:文件路径:@projFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
         // 检查是否匹配
         if (projBasename == basename && (projExt != ""))
         {
-            // Msg("文件名匹配成功,开始匹配后缀:文件路径:@projFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
+            Msg("文件名匹配成功,开始匹配后缀:文件路径:@projFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
             projExtLower = tolower(projExt)
             if (IsExtInList(projExtLower, targetExtList))
             {
 
                 foundFile = projFile
-                // Msg("文件名、后缀匹配成功!:文件路径:@projFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
+                Msg("文件名、后缀匹配成功!:文件路径:@projFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
                 //return foundFile
                 break
             }
-            // Msg("后缀匹配失败!:文件路径:@projFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
+            Msg("后缀匹配失败!:文件路径:@projFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
         }
         i = i + 1
     }
-    // Msg("返回信息:文件路径:@foundFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
+    Msg("返回信息:文件路径:@foundFile@,文件名:@projBasename@,文件拓展名:@projExt@ ")
     return foundFile
 }
 
@@ -323,19 +339,19 @@ Function IsExtInList(ext,targetExtList)
     //curOpenFileExt =ext  // 当前打开文件的扩展名
     index = 0 
     index_end=GetBufLineCount(targetExtList)
-    // Msg("进入后缀匹配函数,当前后缀列表数量为:@index_end@")
+    Msg("进入后缀匹配函数,当前后缀列表数量为:@index_end@")
     while(index < index_end) 
     { 
         bufferExt = GetBufLine(targetExtList, index)
-        // Msg("尝试匹配后缀:@bufferExt@")
+        Msg("尝试匹配后缀:@bufferExt@")
         if(bufferExt == ext) // 匹配成功 
         {
-            // Msg("匹配成功:@bufferExt@")
+            Msg("匹配成功:@bufferExt@")
             isMatch = 1 //匹配成功返回1
             //return isMatch
             break
         } 
-        // Msg("@bufferExt@匹配失败,下一个后缀")
+        Msg("@bufferExt@匹配失败,下一个后缀")
         index = index + 1 
     }// while(index < index_cpp_end) 
     return isMatch //匹配失败返回0
@@ -350,22 +366,22 @@ Function OpenOrSwitch(filepath)
     {
         // 文件已打开,切换到其窗口
 
-        // Msg("文件已打开,正在切换:@filepath@")
+        Msg("文件已打开,正在切换:@filepath@")
         SetCurrentBuf(hbuf)
         
-        // Msg("已切换到文件:@filepath@")
+        Msg("已切换到文件:@filepath@")
     }
     else
     {
         // 打开新文件
-        // Msg("文件未打开,正在打开:@filepath@")
+        Msg("文件未打开,正在打开:@filepath@")
         
         hbuf = OpenBuf(filepath)
         if (hbuf != hNil){
             SetCurrentBuf(hbuf) 
-            // Msg("已打开文件")
+            Msg("已打开文件")
         }else{
-            // Msg("打开文件失败:@filepath@")
+            Msg("打开文件失败:@filepath@")
             
         }
 
