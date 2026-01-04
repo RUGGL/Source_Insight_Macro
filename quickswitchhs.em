@@ -148,7 +148,7 @@ macro QuickSwitchHS()
     {
         // Msg("当前文件无扩展名: @fname@")
         CloseBuf(MatchList) // 关闭缓冲区 
-        CloseBuf(MatchList)
+
         stop
     }
 
