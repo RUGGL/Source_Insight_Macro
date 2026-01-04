@@ -24,7 +24,7 @@
 
 macro QuickSwitchHS()
 {
-    version="20260104_1059"
+    version="20260104_1411"
     // Msg("调试输出:当前版本号 @version@")
     //获取当前打开buffer的句柄
     CurrentBuf = GetCurrentBuf()   
