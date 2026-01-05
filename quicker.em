@@ -2479,14 +2479,14 @@ macro InsertFileHeaderCN(hbuf, ln,szName,szContent)
     sz = GetFileName(GetBufName (hbuf))
     InsBufLine(hbuf, ln + 1,  " * 文 件 名   : @sz@")
     /*InsBufLine(hbuf, ln + 6,  "  版 本 号   : 初稿")*/
-    InsBufLine(hbuf, ln + 2,  " * 负 责 人   : @szName@")
+    InsBufLine(hbuf, ln + 2,  " * 作    者   : @szName@")
     InsBufLine(hbuf, ln + 3,  " * 创建日期   : @szYear@年@szMonth@月@szDay@日")
     /*InsBufLine(hbuf, ln + 9,  "  最近修改 :")*/
     iLen = strlen (szContent)
     nlnDesc = ln
     szTmp = " * 文件描述   : "
     InsBufLine(hbuf, ln + 4, " * 文件描述   : @szContent@")
-    InsBufLine(hbuf, ln + 5, " * 版权说明   : Copyright (c) 2008-@szYear@   xxxx技术有限公司")
+    InsBufLine(hbuf, ln + 5, " * 版权说明   : Copyright (c) @szYear@   xxxx")
     InsBufLine(hbuf, ln + 6, " * 其    他   : ")
     InsBufLine(hbuf, ln + 7, " * 修改日志   : ")
     InsBufLine(hbuf, ln + 8, "***********************************************************************************/")

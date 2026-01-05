@@ -241,4 +241,3 @@ macro ListAllSiblings(symbol)
 	return hbufOutput
 
 }
-
