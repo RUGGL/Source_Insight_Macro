@@ -4013,7 +4013,7 @@ macro CreateFunctionDef(hbuf, szName, language)
             }
             else if( symbol.Type == "Function" )
             {
-                ln = CreateFuncPrototype(hbuf,ln,"extern",symbol)
+                ln = CreateFuncPrototype(hbuf,ln,"",symbol)
             }
             else if( symbol.Type == "Method" ) 
             {
@@ -4202,8 +4202,12 @@ macro CreateFuncPrototype(hbuf,ln,szType,symbol)
     RetVal = SkipCommentFromString(szLine,fIsEnd)
     szNew = RetVal.szContent
     fIsEnd = RetVal.fIsEnd
+
+    if( szType != ""){
     szLine = cat("@szType@ ",szLine)
     szNew = cat("@szType@ ",szNew)
+    }
+
     sline = symbol.lnFirst     
     while((isLastLine == 0) && (sline < symbol.lnLim))
     {   
