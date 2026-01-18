@@ -12,7 +12,6 @@
     修改内容   : 修改
 
 *****************************************************************************/
-
 macro AutoExpand()
 {
     //配置信息
@@ -54,7 +53,6 @@ macro AutoExpand()
     // prepare a new indented blank line to be inserted.
     // keep white space on left and add a tab to indent.
     // this preserves the indentation level.
-    // 维持缩进等级
     chSpace = CharFromAscii(32);
     ich = 0
     while (szLine[ich] == chSpace || szLine[ich] == chTab)
@@ -214,10 +212,7 @@ macro DoxygenNote()
             sel.ichLim=lenLine
             lenLine=strlen(szLine);
             newlnFirst=sel.lnFirst;
-            newichFirst=sel.ichFirst; 
-//              msg("newlnFirst_2 is:@newlnFirst@");
-//              msg("newichFirst_2 is:@newichFirst@");
-//              msg("Cur Line is:@szLine@");      
+            newichFirst=sel.ichFirst;      
             SetWndSel(hwnd, sel)
 
         }
@@ -325,9 +320,6 @@ macro DoxygenComment()
             lenLine=strlen(szLine);
             newlnFirst=sel.lnFirst;
             newichFirst=sel.ichFirst; 
-//              msg("newlnFirst_2 is:@newlnFirst@");
-//              msg("newichFirst_2 is:@newichFirst@");
-//              msg("Cur Line is:@szLine@");      
             SetWndSel(hwnd, sel)
 
         }
@@ -383,32 +375,6 @@ macro ExpandProcEN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
         stop
     hbuf = GetWndBuf(hwnd)
     /*英文注释*/
-//    if (szCmd == "/*")
-//    {   
-//        if(wordinfo.ichLim > 70)
-//        {
-//            Msg("The right margine is small, Please use a new line")
-//            stop 
-//        }
-//        szCurLine = GetBufLine(hbuf, sel.lnFirst);
-//        szLeft = strmid(szCurLine,0,wordinfo.ichLim)
-//        lineLen = strlen(szCurLine)
-//        kk = 0
-//        while(wordinfo.ichLim + kk < lineLen)
-//        {
-//            if((szCurLine[wordinfo.ichLim + kk] != " ")||(szCurLine[wordinfo.ichLim + kk] != "\t")
-//            {
-//                msg("you must insert /* at the end of a line");
-//                return
-//            }
-//            kk = kk + 1
-//        }
-//        szContent = Ask("Please input comment")
-//        DelBufLine(hbuf, ln)
-//        szLeft = cat( szLeft, " ")
-//        CommentContent(hbuf,ln,szLeft,szContent,1)            
-//        return
-//    } 
     if (szCmd == "/*")
     {   
         if(wordinfo.ichLim > 70)
@@ -3776,7 +3742,6 @@ macro FuncHeadCommentCN(hbuf, ln, szFunc, szMyName,newFunc)
 *****************************************************************************/
 
 macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
-{
     iIns = 0
     if(newFunc != 1)
     {
@@ -3972,191 +3937,6 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
 }
 
 
-//原英文函数头不使用,注释掉
-//macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
-//{
-//    iIns = 0
-//    if(newFunc != 1)
-//    {
-//        symbol = GetSymbolLocationFromLn(hbuf, ln)
-//        if(strlen(symbol) > 0)
-//        {
-//            hTmpBuf = NewBuf("Tempbuf")
-                
-//            //将文件参数头整理成一行并去掉了注释
-//            szLine = GetFunctionDef(hbuf,symbol)            
-//            iBegin = symbol.ichName
-            
-//            //取出返回值定义
-//            szTemp = strmid(szLine,0,iBegin)
-//            szTemp = TrimString(szTemp)
-//            szRet =  GetFirstWord(szTemp)
-//            if(symbol.Type == "Method")
-//            {
-//                szTemp = strmid(szTemp,strlen(szRet),strlen(szTemp))
-//                szTemp = TrimString(szTemp)
-//                if(szTemp == "::")
-//                {
-//                    szRet = ""
-//                }
-//            }
-//            if(toupper (szRet) == "MACRO")
-//            {
-//                //对于宏返回值特殊处理
-//                szRet = ""
-//            }
-            
-//            //从函数头分离出函数参数
-//            nMaxParamSize = GetWordFromString(hTmpBuf,szLine,iBegin,strlen(szLine),"(",",",")")
-//            lnMax = GetBufLineCount(hTmpBuf)
-//            ln = symbol.lnFirst
-//            SetBufIns (hbuf, ln, 0)
-//        }
-//    }
-//    else
-//    {
-//        lnMax = 0
-//        szRet = ""
-//        szLine = ""
-//    }
-//    InsBufLine(hbuf, ln, "/*****************************************************************************")
-//    InsBufLine(hbuf, ln+1, " * Function      : @szFunc@")
-//    InsBufLine(hbuf, ln+2, " * Description   : ")
-//    oldln  = ln 
-//    szIns = " * Input         : "
-//    if(newFunc != 1)
-//    {
-//        //对于已经存在的函数输出输入参数表
-//        i = 0
-//        while ( i < lnMax) 
-//        {
-//            szTmp = GetBufLine(hTmpBuf, i)
-//            nLen = strlen(szTmp);
-            
-//            //对齐参数后面的空格，实际是对齐后面的参数的说明
-//            szBlank = CreateBlankString(nMaxParamSize - nLen + 2)
-//            szTmp = cat(szTmp,szBlank)
-//            ln = ln + 1
-//            szTmp = cat(szIns,szTmp)
-//            InsBufLine(hbuf, ln+2, "@szTmp@")
-//            iIns = 1
-//            szIns = " *              "
-//            i = i + 1
-//        }    
-//        closebuf(hTmpBuf)
-//    }
-//    if(iIns == 0)
-//    {       
-//            ln = ln + 1
-//            InsBufLine(hbuf, ln+2, " * Input          : None")
-//    }
-//    InsBufLine(hbuf, ln+3, " * Output        : None")
-//    InsBufLine(hbuf, ln+4, " * Return        : @szRet@")
-//    /*InsBufLine(hbuf, ln+5, " Calls        : ")
-//    InsBufLine(hbuf, ln+6, " Called By    : ")*/
-//    InsbufLIne(hbuf, ln+5, " * Others        : ")
-    
-//    SysTime = GetSysTime(1);
-//    sz1=SysTime.Year
-//    sz2=SysTime.month
-//    sz3=SysTime.day
-//    if (sz2 < 10)
-//    {
-//        szMonth = "0@sz2@"
-//    }
-//    else
-//    {
-//        szMonth = sz2
-//    }
-//    if (sz3 < 10)
-//    {
-//        szDay = "0@sz3@"
-//    }
-//    else
-//    {
-//        szDay = sz3
-//    }
-
-//    InsBufLine(hbuf, ln + 6, " * Record")
-//    InsBufLine(hbuf, ln + 7, " * 1.Date        : @sz1@@szMonth@@szDay@")
-//    InsBufLine(hbuf, ln + 8, " *   Author      : @szMyName@")
-//    InsBufLine(hbuf, ln + 9, " *   Modification: Created function")
-//    InsBufLine(hbuf, ln + 10, "")    
-//    InsBufLine(hbuf, ln + 11, "*****************************************************************************/")
-//    if ((newFunc == 1) && (strlen(szFunc)>0))
-//    {
-//        InsBufLine(hbuf, ln+12, "VOS_UINT32  @szFunc@( # )")
-//        InsBufLine(hbuf, ln+13, "{");
-//        InsBufLine(hbuf, ln+14, "    #");
-//        InsBufLine(hbuf, ln+15, "}");
-//        SearchForward()
-//    }        
-//    hwnd = GetCurrentWnd()
-//    if (hwnd == 0)
-//        stop
-//    sel = GetWndSel(hwnd)
-//    sel.ichFirst = 0
-//    sel.ichLim = sel.ichFirst
-//    sel.lnFirst = ln + 12
-//    sel.lnLast = ln + 12       
-//    szContent = Ask("Description")
-//    DelBufLine(hbuf,oldln + 2)
-//    setWndSel(hwnd,sel)
-//    newln = CommentContent(hbuf,oldln + 2," * Description   : ",szContent,0) - 2
-//    ln = ln + newln - oldln
-//    if ((newFunc == 1) && (strlen(szFunc)>0))
-//    {
-//        //提示输入函数返回值名
-//        szRet = Ask("Please input return value type")
-//        if(strlen(szRet) > 0)
-//        {
-//            PutBufLine(hbuf, ln+4, " * Return        : @szRet@")            
-//            PutBufLine(hbuf, ln+12, "@szRet@ @szFunc@( # )")
-//            SetbufIns(hbuf,ln+12,strlen(szRet)+strlen(szFunc) + 3
-//        }
-//        szFuncDef = ""
-//        isFirstParam = 1
-//        sel.ichFirst = strlen(szFunc)+strlen(szRet) + 3
-//        sel.ichLim = sel.ichFirst + 1
-
-//        //循环输入新函数的参数
-//        while (1)
-//        {
-//            szParam = ask("Please input parameter")
-//            szParam = TrimString(szParam)
-//            szTmp = cat(szIns,szParam)
-//            szParam = cat(szFuncDef,szParam)
-//            sel.lnFirst = ln + 12
-//            sel.lnLast = ln + 12
-//            setWndSel(hwnd,sel)
-//            sel.ichFirst = sel.ichFirst + strlen(szParam)
-//            sel.ichLim = sel.ichFirst
-//            oldsel = sel
-//            if(isFirstParam == 1)
-//            {
-//                PutBufLine(hbuf, ln+2, "@szTmp@")
-//                isFirstParam  = 0
-//            }
-//            else
-//            {
-//                ln = ln + 1
-//                InsBufLine(hbuf, ln+2, "@szTmp@")
-//                oldsel.lnFirst = ln + 12
-//                oldsel.lnLast = ln + 12        
-//            }
-//            SetBufSelText(hbuf,szParam)
-//            szIns = "                "
-//            szFuncDef = ", "
-//            oldsel.lnFirst = ln + 14
-//            oldsel.lnLast = ln + 14
-//            oldsel.ichFirst = 4
-//            oldsel.ichLim = 5
-//            setWndSel(hwnd,oldsel)
-//        }
-//    }
-//    return ln + 15
-//} 
-
 
 /*****************************************************************************
  函 数 名  : InsertHistory
@@ -4178,32 +3958,7 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
 macro InsertHistory(hbuf,ln,language)
 {
     iHistoryCount = 1
-//    isLastLine = ln
-//    i = 0
-//    while(ln-i>0)
-//    {
-//        szCurLine = GetBufLine(hbuf, ln-i);
-//        iBeg1 = searchstr(szCurLine,"日    期  ")
-//        iBeg2 = searchstr(szCurLine,"Date      ")
-//        if((iBeg1 != 0xffffffff) || (iBeg2 != 0xffffffff))
-//        {
-//            iHistoryCount = iHistoryCount + 1
-//            i = i + 1
-//            continue
-//        }
-//        iBeg1 = searchstr(szCurLine,"修改历史")
-//        iBeg2 = searchstr(szCurLine,"History      ")
-//        if((iBeg1 != 0xffffffff) || (iBeg2 != 0xffffffff))
-//        {
-//            break
-//        }
-//        iBeg = searchstr(szCurLine,"/**********************")
-//        if( iBeg != 0xffffffff )
-//        {
-//            break
-//        }
-//       i = i + 1
-//    }
+
     if(language == 0)
     {
         InsertHistoryContentCN(hbuf,ln,iHistoryCount)
