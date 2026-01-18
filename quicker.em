@@ -28,7 +28,8 @@ macro AutoExpand()
     if (sel.ichFirst == 0)
         stop
     hbuf = GetWndBuf(hwnd)
-    language = getreg(LANGUAGE)
+    //language = getreg(LANGUAGE)
+    language=1 //20260118 RUGGL:强行使用英文注释
     if(language != 1)
     {
         language = 0
@@ -310,7 +311,7 @@ macro ExpandProcEN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
             while( 1 )
             {
                 szCurLine = GetBufLine(hbuf, nIdx);
-                nRet = strstr(szCurLine,"{")
+                nRet = searchstr(szCurLine,"{")
                 if( nRet != 0xffffffff )
                 {
                     break;
@@ -380,7 +381,7 @@ macro ExpandProcEN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
         if(ln != lnMax)
         {
             szNextLine = GetBufLine(hbuf,ln)
-            if( (strstr(szNextLine,"(") != 0xffffffff) || (nVer != 2))
+            if( (searchstr(szNextLine,"(") != 0xffffffff) || (nVer != 2))
             {
                 symbol = GetCurSymbol()
                 if(strlen(symbol) != 0)
@@ -982,7 +983,7 @@ macro ExpandProcCN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
             while( 1 )
             {
                 szCurLine = GetBufLine(hbuf, nIdx);
-                nRet = strstr(szCurLine,"{")
+                nRet = searchstr(szCurLine,"{")
                 if( nRet != 0xffffffff )
                 {
                     break;
@@ -1071,7 +1072,7 @@ macro ExpandProcCN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
             szNextLine = GetBufLine(hbuf,ln)
             /*对于2.1版的si如果是非法symbol就会中断执行，故该为以后一行
               是否有‘（’来判断是否是新函数*/
-            if( (strstr(szNextLine,"(") != 0xffffffff) || (nVer != 2))
+            if(  (nVer != 2)) //(searchstr(szNextLine,"(") != 0xffffffff) ||
             {
                 /*是已经存在的函数*/
                 symbol = GetCurSymbol()
@@ -1633,7 +1634,7 @@ macro InsertFuncName()
 }
 
 /*****************************************************************************
- 函 数 名  : strstr
+ 函 数 名  : searchstr (原strstr)
  功能描述  : 字符串匹配查询函数
  输入参数  : str1  源串
              str2  待匹配子串
@@ -1647,35 +1648,43 @@ macro InsertFuncName()
   1.日    期   : 2008年6月18日
     作    者   : 张强
     修改内容   : 新生成函数
+    2.日    期   : 2026年1月18日
+      作    者   : RUGGL
+      修改内容   : 修改函数名,原函数名为strstr,不知道什么原因,source insight 4.00.0141版本无法识别strstr这个宏名称,
+      导致其他函数调用失败,因此修改名称,函数代码有细微调整
+
 
 *****************************************************************************/
-macro strstr(str1,str2)
+macro searchstr(str1,str2)
 {
-    i = 0
+
     j = 0
     len1 = strlen(str1)
     len2 = strlen(str2)
-    if((len1 == 0) || (len2 == 0))
+
+    if((len1 == 0) || (len2 == 0) || len1<len2)
     {
         return 0xffffffff
     }
-    while( i < len1)
+    num = len1-len2+1
+    i = 0
+    while( i < num)
     {
+        j=0
         if(str1[i] == str2[j])
         {
             while(j < len2)
             {
-                j = j + 1
                 if(str1[i+j] != str2[j]) 
                 {
                     break
                 }
+                j = j + 1
             }     
             if(j == len2)
             {
                 return i
             }
-            j = 0
         }
         i = i + 1      
     }  
@@ -1745,7 +1754,7 @@ macro InsertTraceInCurFunction(hbuf,symbol)
         szLine = RetVal.szContent
         fIsEnd = RetVal.fIsEnd
         //查找是否有return语句
-/*        ret =strstr(szLine,"return")
+/*        ret =searchstr(szLine,"return")
         if(ret != 0xffffffff)
         {
             if( (szLine[ret+6] == " " ) || (szLine[ret+6] == "\t" )
@@ -1784,7 +1793,7 @@ macro InsertTraceInCurFunction(hbuf,symbol)
         szRet = GetFirstWord(szLine)
 //        if( (szRet == "if") || (szRet == "else")
         //查找是否有return语句
-//        ret =strstr(szLine,"return")
+//        ret =searchstr(szLine,"return")
         
         if( szRet == "return")
         {
@@ -1811,7 +1820,7 @@ macro InsertTraceInCurFunction(hbuf,symbol)
         }
         else
         {
-            ret =strstr(szLine,"}")
+            ret =searchstr(szLine,"}")
             if( ret != 0xffffffff )
             {
                 fIsNeedPrt = 1
@@ -1961,7 +1970,7 @@ macro AutoInsertTraceInfoInBuf()
                         //查找到函数的开始
                         if(isCodeBegin == 0)
                         {
-                            iRet = strstr(szNew,"{")
+                            iRet = searchstr(szNew,"{")
                             if(iRet != 0xffffffff)
                             {
                                 isCodeBegin = 1
@@ -2015,7 +2024,7 @@ macro AutoInsertTraceInfoInBuf()
                     //查找到函数的开始
                     if(isCodeBegin == 0)
                     {
-                        iRet = strstr(szNew,"{")
+                        iRet = searchstr(szNew,"{")
                         if(iRet != 0xffffffff)
                         {
                             isCodeBegin = 1
@@ -2201,7 +2210,7 @@ macro RemoveTraceInfo()
         RetVal = TrimString(szLine)
         if(fIsEntry == 0)
         {
-            ret = strstr(szLine,szEntry)
+            ret = searchstr(szLine,szEntry)
             if(ret != 0xffffffff)
             {
                 DelBufLine(hbuf,ln)
@@ -2211,7 +2220,7 @@ macro RemoveTraceInfo()
                 continue
             }
         }
-        ret = strstr(szLine,szExit)
+        ret = searchstr(szLine,szExit)
         if(ret != 0xffffffff)
         {
             DelBufLine(hbuf,ln)
@@ -2676,7 +2685,7 @@ macro CommentContent1 (hbuf,ln,szPreStr,szContent,isEnd)
     //去掉多余的空格
     szTmp = TrimString(szContent)
     //如果输入窗口中的内容是剪贴板中的内容说明是剪贴过来的
-    ret = strstr(szClip,szTmp)
+    ret = searchstr(szClip,szTmp)
     if(ret == 0)
     {
         szContent = szClip
@@ -2817,7 +2826,7 @@ macro CommentContent (hbuf,ln,szPreStr,szContent,isEnd)
     if(lnMax != 0)
     {
         szLine = GetBufLine(hNewBuf , 0)
-        ret = strstr(szLine,szTmp)
+        ret = searchstr(szLine,szTmp)
         if(ret == 0)
         {
             /*如果输入窗输入的内容是剪贴板的一部分说明是剪贴过来的取剪贴板中的内
@@ -3120,7 +3129,12 @@ macro GetFunctionDef(hbuf,symbol)
         szLine = TrimString(szLine)
         fIsEnd = RetVal.fIsEnd
         //如果是{表示函数参数头结束了
-        ret = strstr(szLine,"{")        
+        // 在出错行之前添加
+//        Msg("Debug: szLine = " . szLine)
+//        Msg("Debug: szLine length = " . strlen(szLine))
+//        Msg("Debug: ln = " . ln)
+        ret=searchstr(szLine,"{")
+//        Msg("Debug: reg = " . ret)
         if(ret != 0xffffffff)
         {
             szLine = strmid(szLine,0,ret)
@@ -3709,21 +3723,21 @@ macro InsertHistory(hbuf,ln,language)
 //    while(ln-i>0)
 //    {
 //        szCurLine = GetBufLine(hbuf, ln-i);
-//        iBeg1 = strstr(szCurLine,"日    期  ")
-//        iBeg2 = strstr(szCurLine,"Date      ")
+//        iBeg1 = searchstr(szCurLine,"日    期  ")
+//        iBeg2 = searchstr(szCurLine,"Date      ")
 //        if((iBeg1 != 0xffffffff) || (iBeg2 != 0xffffffff))
 //        {
 //            iHistoryCount = iHistoryCount + 1
 //            i = i + 1
 //            continue
 //        }
-//        iBeg1 = strstr(szCurLine,"修改历史")
-//        iBeg2 = strstr(szCurLine,"History      ")
+//        iBeg1 = searchstr(szCurLine,"修改历史")
+//        iBeg2 = searchstr(szCurLine,"History      ")
 //        if((iBeg1 != 0xffffffff) || (iBeg2 != 0xffffffff))
 //        {
 //            break
 //        }
-//        iBeg = strstr(szCurLine,"/**********************")
+//        iBeg = searchstr(szCurLine,"/**********************")
 //        if( iBeg != 0xffffffff )
 //        {
 //            break
@@ -3854,7 +3868,7 @@ macro  InsertHistoryContentCN(hbuf,ln,iHostoryCount)
     strLeft = strmid (szLine, 0, wordinfo.ich)
 
     //判断左侧的字符是否有" * 修改日志   :"
-    ret =strstr(strLeft, " * 修改日志   :")
+    ret =searchstr(strLeft, " * 修改日志   :")
     if(ret != 0xffffffff)   //修改日志的第一行，保留"修改日志"字符串
     {
         szTmp = strLeft
@@ -4118,7 +4132,7 @@ macro CreateClassPrototype(hbuf,ln,symbol)
     szLine = GetBufLine (hbuf, symbol.lnName)
     sline = symbol.lnFirst     
     szClassName = symbol.Symbol
-    ret = strstr(szLine,szClassName)
+    ret = searchstr(szLine,szClassName)
     if(ret == 0xffffffff)
     {
         return ln
@@ -4984,7 +4998,7 @@ macro DelCompoundStatement()
         szTmp = RetVal.szContent
         fIsEnd = RetVal.fIsEnd
         //查找复合语句的开始
-        ret = strstr(szTmp,"{")
+        ret = searchstr(szTmp,"{")
         if(ret != 0xffffffff)
         {
             szNewLine = strmid(szLine,ret+1,strlen(szLine))
@@ -5429,7 +5443,7 @@ macro GetSwitchVar(szLine)
     {
         return ""
     }
-    ret = strstr(szLine,"#define" )
+    ret = searchstr(szLine,"#define" )
     if(ret != 0xffffffff)
     {
         szLine = strmid(szLine,ret + 8,strlen(szLine))
@@ -7086,7 +7100,7 @@ macro FunctionHeaderCreate()
     if(ln != lnMax)
     {
         szNextLine = GetBufLine(hbuf,ln)
-        if( (strstr(szNextLine,"(") != 0xffffffff) || (nVer != 2 ))
+        if( (searchstr(szNextLine,"(") != 0xffffffff) || (nVer != 2 ))
         {
             symbol = GetCurSymbol()
             if(strlen(symbol) != 0)
