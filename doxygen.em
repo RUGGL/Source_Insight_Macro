@@ -12,7 +12,7 @@
 
 //*****************************************************************************
 //
-//! \addtogroup doxygen
+//! @addtogroup doxygen
 //! @{
 //
 //*****************************************************************************
@@ -92,12 +92,12 @@ macro doxygenAddFuncHeader()
     ln = GetBufLnCur( hbuf )
 
     InsBufLine( hbuf, ln + 0, "/**" )
-    InsBufLine( hbuf, ln + 1, "  * \@brief " )
-    InsBufLine( hbuf, ln + 2, "  *" )
-    InsBufLine( hbuf, ln + 3, "  * \@param " )
-    InsBufLine( hbuf, ln + 4, "  *" )
-    InsBufLine( hbuf, ln + 5, "  * \@retval " )
-    InsBufLine( hbuf, ln + 6, "  */" )
+    InsBufLine( hbuf, ln + 1, " * \@brief  " )
+    InsBufLine( hbuf, ln + 2, " *" )
+    InsBufLine( hbuf, ln + 3, " * \@param  " )
+    InsBufLine( hbuf, ln + 4, " *" )
+    InsBufLine( hbuf, ln + 5, " * \@retval " )
+    InsBufLine( hbuf, ln + 6, " */" )
     
     // put the insertion point inside the header comment
     SetBufIns( hbuf, ln + 0, 50 )
@@ -184,10 +184,10 @@ macro doxygenAddFuncHeaderAutoGenerate()
 
     InsBufLine( hbuf, func_ln + 0, "/**" )  
 
-    InsBufLine( hbuf, func_ln + 1, "  * \@brief @func_name@" )
+    InsBufLine( hbuf, func_ln + 1, " * \@brief  @func_name@" )
     
     
-    InsBufLine( hbuf, func_ln + 2, "  *" )
+    InsBufLine( hbuf, func_ln + 2, " * " )
     
     empty_str=strmid(func_str,0,0)
     
@@ -199,17 +199,17 @@ macro doxygenAddFuncHeaderAutoGenerate()
         
         if("void" == func_name || "" == func_name)
         {
-            InsBufLine( hbuf, func_ln + 3, "  * \@param None" ) 
-            InsBufLine( hbuf, func_ln + 4, "  *" ) 
+            InsBufLine( hbuf, func_ln + 3, " * \@param  None" ) 
+            InsBufLine( hbuf, func_ln + 4, " *" ) 
         }  
         else
         {
             para=DelStrPointer(Trim(GetStrSplit(func_str,")"," ",0)))
-            InsBufLine( hbuf, func_ln + 3, "  * \@param @para@" ) 
-            InsBufLine( hbuf, func_ln + 4, "  *" )       
+            InsBufLine( hbuf, func_ln + 3, " * \@param  @para@" ) 
+            InsBufLine( hbuf, func_ln + 4, " *" )       
         }
-        InsBufLine( hbuf, func_ln + 4+(para_num_max)*2+1, "  * \@return " )
-        InsBufLine( hbuf, func_ln + 4+(para_num_max)*2+2, "  */" ) 
+        InsBufLine( hbuf, func_ln + 4+(para_num_max)*2+1, " * \@retval " )
+        InsBufLine( hbuf, func_ln + 4+(para_num_max)*2+2, " */" ) 
     }
     else
     {    
@@ -217,18 +217,18 @@ macro doxygenAddFuncHeaderAutoGenerate()
         while(1)
         {
             para = DelStrPointer(Trim(GetStrSplit(func_str,","," ",0)))           
-            InsBufLine( hbuf, func_ln + 4+(para_num)*1+1, "  * \@param @para@" )           
+            InsBufLine( hbuf, func_ln + 4+(para_num)*1+1, " * \@param  @para@" )           
             
             para_num=para_num+1
             if(para_num == para_num_max)
             {
                 para=DelStrPointer(Trim(GetStrSplit(func_str,")"," ",0)))
-                InsBufLine( hbuf, func_ln + 4+(para_num)*1+1, "  * \@param @para@" ) 
-                InsBufLine( hbuf, func_ln + 4+(para_num)*1+2, "  *" )
+                InsBufLine( hbuf, func_ln + 4+(para_num)*1+1, " * \@param  @para@" ) 
+                InsBufLine( hbuf, func_ln + 4+(para_num)*1+2, " *" )
                 
                 func_ln=func_ln+2
-                InsBufLine( hbuf, func_ln + 4+(para_num_max)*1+1, "  * \@retval " )
-                InsBufLine( hbuf, func_ln + 4+(para_num_max)*1+2, "  */" )                 
+                InsBufLine( hbuf, func_ln + 4+(para_num_max)*1+1, " * \@retval " )
+                InsBufLine( hbuf, func_ln + 4+(para_num_max)*1+2, " */" )                 
                 break;
             }
             else
@@ -268,21 +268,21 @@ macro doxygenAddFileHeader()
 
     sz = GetFileName(GetBufName(hbuf))
     ln=0 
-    InsBufLine( hbuf, ln,"//*****************************************************************************" )
+    InsBufLine( hbuf, ln,"/******************************************************************************" )
     ln=ln+1   
-    InsBufLine( hbuf, ln, "// file    : @sz@" )
+    InsBufLine( hbuf, ln, " * file    : @sz@" )
     ln=ln+1
-    InsBufLine( hbuf, ln, "// It's a @sz@ file" )
+    InsBufLine( hbuf, ln, " * It's a @sz@ file" )
     ln=ln+1
-    InsBufLine( hbuf, ln, "// " )
+    InsBufLine( hbuf, ln, " * " )
     ln=ln+1
-    InsBufLine( hbuf, ln, "// Copyright (c) 2011-2020  co. Ltd. All rights reserved" )
+    InsBufLine( hbuf, ln, " * Copyright (c) 2011-2020  co. Ltd. All rights reserved" )
     ln=ln+1
-    InsBufLine( hbuf, ln, "// ")
+    InsBufLine( hbuf, ln, " * ")
     ln=ln+1
-    InsBufLine( hbuf, ln, "// Change Logs:")
+    InsBufLine( hbuf, ln, " * Change Logs:")
     ln=ln+1
-    InsBufLine( hbuf, ln, "// Date               Author              Note    ")
+    InsBufLine( hbuf, ln, " * Date               Author              Note    ")
     
     spaces="                                                                                                                   "
     len =0
@@ -299,22 +299,22 @@ macro doxygenAddFileHeader()
     if(month<10 && day <10)
     {
         ln=ln+1
-        InsBufLine( hbuf, ln, "// @year@/0@month@/0@day@          @szMyName@@struct_member_space@First draft version")
+        InsBufLine( hbuf, ln, " * @year@/0@month@/0@day@          @szMyName@@struct_member_space@First draft version")
     }
     else if(month<10 && day >10)
     {
         ln=ln+1
-        InsBufLine( hbuf, ln, "// @year@/0@month@/@day@          @szMyName@@struct_member_space@First draft version")
+        InsBufLine( hbuf, ln, " * @year@/0@month@/@day@          @szMyName@@struct_member_space@First draft version")
     }
     else
     {
         ln=ln+1
-        InsBufLine( hbuf, ln, "// @year@/@month@/@day@          @szMyName@@struct_member_space@First draft version")
+        InsBufLine( hbuf, ln, " * @year@/@month@/@day@          @szMyName@@struct_member_space@First draft version")
     }
     ln=ln+1
-    InsBufLine( hbuf, ln, "// " )
+    InsBufLine( hbuf, ln, " * " )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//*****************************************************************************" )
+    InsBufLine( hbuf, ln, "*******************************************************************************/" )
     
     ln=ln+1
     InsBufLine( hbuf, ln, "" )
@@ -333,34 +333,34 @@ macro doxygenAddFileHeader()
     }
           
     ln=ln+1
-    InsBufLine( hbuf, ln, "//*****************************************************************************" )
+    InsBufLine( hbuf, ln, "/******************************************************************************" )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//" )
+    InsBufLine( hbuf, ln, " * " )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//! \@addtogroup @szModule@" )
+    InsBufLine( hbuf, ln, " * \@addtogroup @szModule@" )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//! \@{" )
+    InsBufLine( hbuf, ln, " * \@{" )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//" )
+    InsBufLine( hbuf, ln, " * " )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//*****************************************************************************" )
+    InsBufLine( hbuf, ln, "*******************************************************************************/" )
   
     ln=ln+1
     InsBufLine( hbuf, ln, "" )   
     if("h"==GetFileNameExt(GetBufName(hbuf))
     {
         ln=ln+1
-        InsBufLine( hbuf, ln, "//*****************************************************************************" )
+        InsBufLine( hbuf, ln, "/******************************************************************************" )
         ln=ln+1
-        InsBufLine( hbuf, ln, "//" )
+        InsBufLine( hbuf, ln, " * " )
         ln=ln+1
-        InsBufLine( hbuf, ln, "// If building with a C++ compiler, make all of the definitions in this header" )
+        InsBufLine( hbuf, ln, " * If building with a C++ compiler, make all of the definitions in this header" )
         ln=ln+1
-        InsBufLine( hbuf, ln, "// have a C binding." )
+        InsBufLine( hbuf, ln, " * have a C binding." )
         ln=ln+1
-        InsBufLine( hbuf, ln, "//")
+        InsBufLine( hbuf, ln, " * ")
         ln=ln+1
-        InsBufLine( hbuf, ln, "//*****************************************************************************")
+        InsBufLine( hbuf, ln, "*******************************************************************************/")
         ln=ln+1
         InsBufLine( hbuf, ln, "#ifdef __cplusplus")
         ln=ln+1
@@ -377,27 +377,27 @@ macro doxygenAddFileHeader()
         ln =ln-2
         
         ln=ln+1
-        InsBufLine( hbuf, ln, "//*****************************************************************************" )   
+        InsBufLine( hbuf, ln, "/******************************************************************************" )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "//" )   
+        InsBufLine( hbuf, ln, " * " )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "// Prototypes for the APIs." )   
+        InsBufLine( hbuf, ln, " * Prototypes for the APIs." )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "//" )   
+        InsBufLine( hbuf, ln, " * " )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "//*****************************************************************************" )   
+        InsBufLine( hbuf, ln, "*******************************************************************************/" )   
         ln=ln+1
         InsBufLine( hbuf, ln, "" )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "//*****************************************************************************" )   
+        InsBufLine( hbuf, ln, "/******************************************************************************" )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "//" )   
+        InsBufLine( hbuf, ln, " * " )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "// Mark the end of the C bindings section for C++ compilers." )   
+        InsBufLine( hbuf, ln, " * Mark the end of the C bindings section for C++ compilers." )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "//" )   
+        InsBufLine( hbuf, ln, " * " )   
         ln=ln+1
-        InsBufLine( hbuf, ln, "//*****************************************************************************" )   
+        InsBufLine( hbuf, ln, "*******************************************************************************/" )   
         ln=ln+1
         InsBufLine( hbuf, ln, "#ifdef __cplusplus" )   
         ln=ln+1
@@ -410,17 +410,17 @@ macro doxygenAddFileHeader()
     
     ln =ln+2
     
-    InsBufLine( hbuf, ln, "//*****************************************************************************" )
+    InsBufLine( hbuf, ln, "/******************************************************************************" )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//" )
+    InsBufLine( hbuf, ln, " * " )
     ln=ln+1
-    InsBufLine( hbuf, ln, "// Close the Doxygen group." )
+    InsBufLine( hbuf, ln, " * Close the Doxygen group." )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//! \@{" )
+    InsBufLine( hbuf, ln, " * \@}" )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//" )
+    InsBufLine( hbuf, ln, " * " )
     ln=ln+1
-    InsBufLine( hbuf, ln, "//*****************************************************************************" )
+    InsBufLine( hbuf, ln, "*******************************************************************************/" )
 
     if("h"==GetFileNameExt(GetBufName(hbuf))
     {    
@@ -967,6 +967,6 @@ macro ToFuncValidName(sz)
 //*****************************************************************************
 //
 // Close the Doxygen group.
-//! @{
+//! @}
 //
 //*****************************************************************************
