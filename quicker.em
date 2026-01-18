@@ -2674,12 +2674,12 @@ macro InsertFileHeaderEN(hbuf, ln,szName,szContent)
     szYear=SysTime.Year
     GetFunctionList(hbuf,hnewbuf)
     InsBufLine(hbuf, ln + 0,  "/********************************************************************************")
-    InsBufLine(hbuf, ln + 1,  "")
-    InsBufLine(hbuf, ln + 2,  " **** Copyright (C), @szYear@, xx xx xx xx info&tech Co., Ltd.                ****")
-    InsBufLine(hbuf, ln + 3,  "")
+    InsBufLine(hbuf, ln + 1,  " * ")
+    InsBufLine(hbuf, ln + 2,  " * Copyright (C), @szYear@, xx xx xx xx info&tech Co., Ltd.                ****")
+    InsBufLine(hbuf, ln + 3,  " * All rights reserved.")
     InsBufLine(hbuf, ln + 4,  " ********************************************************************************")
     sz = GetFileName(GetBufName (hbuf))
-    InsBufLine(hbuf, ln + 5,  " * File Name     : @sz@")
+    InsBufLine(hbuf, ln + 5,  " * @file     : @sz@")
     InsBufLine(hbuf, ln + 6,  " * Author        : @szName@")
     SysTime = GetSysTime(1)
     sz=SysTime.Year
@@ -2816,7 +2816,7 @@ macro InsertFileHeaderCN(hbuf, ln,szName,szContent)
     nlnDesc = ln
     szTmp = " * 文件描述   : "
     InsBufLine(hbuf, ln + 4, " * 文件描述   : @szContent@")
-    InsBufLine(hbuf, ln + 5, " * 版权说明   : Copyright \@2026 - @szCurYear@ @szOrganizationName@")
+    InsBufLine(hbuf, ln + 5, " * 版权说明   : Copyright \@2026 - @szCurYear@ xxx")
     InsBufLine(hbuf, ln + 6, " * 其    他   : ")
     InsBufLine(hbuf, ln + 7, " * 修改日志   : ")
     InsBufLine(hbuf, ln + 8, "***********************************************************************************/")
@@ -3821,12 +3821,12 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
     InsBufLine(hbuf, ln, "/**")
 
     oldln = ln
-    InsBufLine(hbuf, ln+1, " * \@brief  : ")
+    InsBufLine(hbuf, ln+1, " * \@brief  ")
     InsBufLine(hbuf, ln+2, " * ")
     ln = ln +1
     InsBufLine(hbuf, ln+2, " * ")
 
-    szIns = " * \@param "
+    szIns = " * \@param  "
     if(newFunc != 1)
     {
         //对于已经存在的函数插入函数参数
@@ -3843,7 +3843,7 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
 
             InsBufLine(hbuf, ln+2, "@szTmp@")
             iIns = 1
-            szIns = " *           "
+            szIns = " *         "
             i = i + 1
         }    
         closebuf(hTmpBuf)
@@ -3851,9 +3851,9 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
     if(iIns == 0)
     {       
             ln = ln + 1
-            InsBufLine(hbuf, ln+2, " * \@param none")
+            InsBufLine(hbuf, ln+2, " * \@param  none")
     }
-    InsBufLine(hbuf, ln+3, "*")
+    InsBufLine(hbuf, ln+3, " * ")
     InsBufLine(hbuf, ln+4, " * \@retval @szRet@")
     InsBufLine(hbuf, ln+5, " * ")
     InsBufLine(hbuf, ln+6, " * ")
@@ -3889,10 +3889,10 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
             szDay = sz3
         }
 
-    InsBufLine(hbuf, ln+8, " * \@date @sz1@@szMonth@@szDay@")
+    InsBufLine(hbuf, ln+8, " * \@date   @sz1@@szMonth@@szDay@")
 
 
-    InsBufLine(hbuf, ln+9, " * \@note #")    
+    InsBufLine(hbuf, ln+9, " * \@note   #")    
     InsBufLine(hbuf, ln+10, " * ")    
     InsBufLine(hbuf, ln+11, " */")
     if ((newFunc == 1) && (strlen(szFunc)>0))
@@ -3916,7 +3916,7 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
     DelBufLine(hbuf,oldln + 1)
 
     //显示输入的功能描述内容
-    newln = CommentContent(hbuf,oldln+1," * \@brief ",szContent,0) - 2
+    newln = CommentContent(hbuf,oldln+1," * \@brief  ",szContent,0) - 2
     ln = ln + newln - oldln
     if ((newFunc == 1) && (strlen(szFunc)>0))
     {
@@ -3926,7 +3926,7 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
         szRet = Ask("Please input return value type")
         if(strlen(szRet) > 0)
         {
-            PutBufLine(hbuf, ln+4, " * \@return @szRet@")            
+            PutBufLine(hbuf, ln+4, " * \@retval @szRet@")            
             PutBufLine(hbuf, ln+12, "@szRet@ @szFunc@(   )")
             SetbufIns(hbuf,ln+12,strlen(szRet)+strlen(szFunc) + 3
         }
@@ -3959,7 +3959,7 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
                 oldsel.lnLast = ln + 12      
             }
             SetBufSelText(hbuf,szParam)
-            szIns = " *           "
+            szIns = " *         "
             szFuncDef = ", "
             oldsel.lnFirst = ln + 14
             oldsel.lnLast = ln + 14

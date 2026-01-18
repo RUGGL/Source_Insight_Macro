@@ -17,12 +17,12 @@
 //
 //*****************************************************************************
 
-/** @brief    AddVarUp
+/** @brief    doxygenAddVarUp
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddVarUp()
+macro doxygenAddVarUp()
 {
     // Get a handle to the current file buffer and the name
     // and location of the current symbol where the cursor is.
@@ -45,12 +45,12 @@ macro AddVarUp()
     SetBufIns( hbuf, ln , strlen(tmp)-3 )  
 }
 
-/** @brief    AddVarRight
+/** @brief    doxygenAddVarRight
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddVarRight()
+macro doxygenAddVarRight()
 {
     // Get a handle to the current file buffer and the name
     // and location of the current symbol where the cursor is.
@@ -73,12 +73,12 @@ macro AddVarRight()
     SetBufIns( hbuf, ln , strlen(tmp)-3 )  
 }
 
-/** @brief    AddFuncHeader
+/** @brief    doxygenAddFuncHeader
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddFuncHeader()
+macro doxygenAddFuncHeader()
 {
     // Get a handle to the current file buffer and the name
     // and location of the current symbol where the cursor is.
@@ -96,7 +96,7 @@ macro AddFuncHeader()
     InsBufLine( hbuf, ln + 2, "  *" )
     InsBufLine( hbuf, ln + 3, "  * \@param " )
     InsBufLine( hbuf, ln + 4, "  *" )
-    InsBufLine( hbuf, ln + 5, "  * \@return " )
+    InsBufLine( hbuf, ln + 5, "  * \@retval " )
     InsBufLine( hbuf, ln + 6, "  */" )
     
     // put the insertion point inside the header comment
@@ -104,12 +104,12 @@ macro AddFuncHeader()
     
 }
 
-/** @brief    AddFuncHeaderAutoGenerate
+/** @brief    doxygenAddFuncHeaderAutoGenerate
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddFuncHeaderAutoGenerate()
+macro doxygenAddFuncHeaderAutoGenerate()
 {
     func_str = ""
     func_ln = 0
@@ -227,7 +227,7 @@ macro AddFuncHeaderAutoGenerate()
                 InsBufLine( hbuf, func_ln + 4+(para_num)*1+2, "  *" )
                 
                 func_ln=func_ln+2
-                InsBufLine( hbuf, func_ln + 4+(para_num_max)*1+1, "  * \@return " )
+                InsBufLine( hbuf, func_ln + 4+(para_num_max)*1+1, "  * \@retval " )
                 InsBufLine( hbuf, func_ln + 4+(para_num_max)*1+2, "  */" )                 
                 break;
             }
@@ -241,12 +241,12 @@ macro AddFuncHeaderAutoGenerate()
     func_ln=func_ln+2
 }
 
-/** @brief    AddFileHeader
+/** @brief    doxygenAddFileHeader
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddFileHeader()
+macro doxygenAddFileHeader()
 {
     szMyName = Ask( "[Add File Header] Please enter your name:" )  
     szModule = Ask( "[Add File Header] Please enter your module:" )  
@@ -432,12 +432,12 @@ macro AddFileHeader()
     }
 }
 
-/** @brief    AddStruct
+/** @brief    doxygenAddStruct
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddStruct()
+macro doxygenAddStruct()
 {  
     // Get a handle to the current file buffer and the name
     // and location of the current symbol where the cursor is.
@@ -478,12 +478,12 @@ macro AddStruct()
     InsBufLine( hbuf, ln,"typedef struct @struct_name@ @struct_name@_t;" )
 }
 
-/** @brief    AddStructDemo
+/** @brief    doxygenAddStructDemo
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddStructDemo()
+macro doxygenAddStructDemo()
 {
     // Get a handle to the current file buffer and the name
     // and location of the current symbol where the cursor is.
@@ -506,12 +506,12 @@ macro AddStructDemo()
 }
 
 
-/** @brief    AddEnum
+/** @brief    doxygenAddEnum
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddEnum()
+macro doxygenAddEnum()
 {
     // Get a handle to the current file buffer and the name
     // and location of the current symbol where the cursor is.
@@ -553,12 +553,12 @@ macro AddEnum()
     InsBufLine( hbuf, ln,"typedef enum @enum_name@ @enum_name@_t;" )
 }
 
-/** @brief    AddEnumDemo
+/** @brief    doxygenAddEnumDemo
   * @param[in]  
   * @param[out]  
   * @return  
   */
-macro AddEnumDemo()
+macro doxygenAddEnumDemo()
 {
     // Get a handle to the current file buffer and the name
     // and location of the current symbol where the cursor is.
