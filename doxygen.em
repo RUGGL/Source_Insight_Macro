@@ -337,9 +337,9 @@ macro doxygenAddFileHeader()
     ln=ln+1
     InsBufLine( hbuf, ln, " * " )
     ln=ln+1
-    InsBufLine( hbuf, ln, " * \@addtogroup @szModule@" )
+    InsBufLine( hbuf, ln, " * ! \@addtogroup @szModule@" )
     ln=ln+1
-    InsBufLine( hbuf, ln, " * \@{" )
+    InsBufLine( hbuf, ln, " * ! \@{" )
     ln=ln+1
     InsBufLine( hbuf, ln, " * " )
     ln=ln+1
@@ -416,7 +416,7 @@ macro doxygenAddFileHeader()
     ln=ln+1
     InsBufLine( hbuf, ln, " * Close the Doxygen group." )
     ln=ln+1
-    InsBufLine( hbuf, ln, " * \@}" )
+    InsBufLine( hbuf, ln, " * ! \@}" )
     ln=ln+1
     InsBufLine( hbuf, ln, " * " )
     ln=ln+1
