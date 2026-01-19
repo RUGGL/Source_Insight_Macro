@@ -581,7 +581,7 @@ macro doxygenAddEnumDemo()
     InsBufLine( hbuf, ln+9,"typedef enum color color_t;" )
 }
 
-macro GetFileName(sz)
+function GetFileName(sz)
 {
     i = 1
     szName = sz
@@ -600,7 +600,7 @@ macro GetFileName(sz)
     return szName
 }
 
-macro GetFileNameExt(sz)
+function GetFileNameExt(sz)
 {
     i = 1
     j = 0
@@ -621,7 +621,7 @@ macro GetFileNameExt(sz)
     return ""
 }
 
-macro GetFileNameNoExt(sz)
+function GetFileNameNoExt(sz)
 {
     i = 1
     szName = sz
@@ -646,7 +646,7 @@ macro GetFileNameNoExt(sz)
     return szName
 }
 
-macro TrimLeft(sz)  
+function TrimLeft(sz)  
 {  
     i=0
     j=0  
@@ -671,7 +671,7 @@ macro TrimLeft(sz)
     return return_str
 }  
 
-macro TrimRight(sz)  
+function TrimRight(sz)  
 {  
     i=0
     return_str=sz
@@ -692,7 +692,7 @@ macro TrimRight(sz)
     return return_str
 }  
 
-macro Trim(sz)
+function Trim(sz)
 {
     sz = TrimLeft(sz)
     sz = TrimRight(sz)
@@ -701,7 +701,7 @@ macro Trim(sz)
 }  
 
 
-macro GetStrSplit(sz,chr_end,chr_start,start_index)  
+function GetStrSplit(sz,chr_end,chr_start,start_index)  
 {  
     i=0
     return_str=sz
@@ -762,7 +762,7 @@ macro GetStrSplit(sz,chr_end,chr_start,start_index)
 
 
 
-macro GetStrSplitHeadStr(sz,chr_end,chr_start)  
+function GetStrSplitHeadStr(sz,chr_end,chr_start)  
 {  
     i=0
     return_str=sz
@@ -820,7 +820,7 @@ macro GetStrSplitHeadStr(sz,chr_end,chr_start)
     }
 }  
 
-macro GetStrChr(sz,chr)  
+function GetStrChr(sz,chr)  
 {  
     i=0
     return_str=sz
@@ -855,7 +855,7 @@ macro GetStrChr(sz,chr)
     }
 }
 
-macro GetStrChrIndex(sz,chr)  
+function GetStrChrIndex(sz,chr)  
 {  
     i=0
     return_str=sz
@@ -882,7 +882,7 @@ macro GetStrChrIndex(sz,chr)
     return index
 
 }
-macro GetStrChrNum(sz,chr)  
+function GetStrChrNum(sz,chr)  
 {  
     i =0
     while(1)
@@ -900,7 +900,7 @@ macro GetStrChrNum(sz,chr)
     return i
 }
 
-macro GetStrRev(sz)  
+function GetStrRev(sz)  
 {  
     i=0
     return_str=sz
@@ -923,7 +923,7 @@ macro GetStrRev(sz)
     return return_str
 }
 
-macro DelStrPointer(sz)  
+function DelStrPointer(sz)  
 {  
     i=0
     return_str=sz
@@ -940,7 +940,7 @@ macro DelStrPointer(sz)
     }   
 }
 
-macro ToFuncValidName(sz)  
+function ToFuncValidName(sz)  
 {  
     i=0
     return_str=sz

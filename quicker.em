@@ -246,7 +246,7 @@ macro DoxygenNote()
 
 *****************************************************************************/
 
-macro DoxygenComment()
+function DoxygenComment()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -374,7 +374,7 @@ macro DoxygenComment()
                  删除原自动扩展码为"an"的单行注释
 
 *****************************************************************************/
-macro ExpandProcEN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
+function ExpandProcEN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
 {
   
     szCmd = wordinfo.szWord
@@ -1093,7 +1093,7 @@ macro ExpandProcEN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
     修改内容   : 把0Litost0的git仓库增加的内容加入进来了
 
 *****************************************************************************/
-macro ExpandProcCN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
+function ExpandProcCN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
 {
     szCmd = wordinfo.szWord
     hwnd = GetCurrentWnd()
@@ -1768,7 +1768,7 @@ macro ExpandProcCN(szMyName,wordinfo,szLine,szLine1,nVer,ln,sel)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro BlockCommandProc()
+function BlockCommandProc()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -1864,7 +1864,7 @@ macro BlockCommandProc()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro RestoreCommand(hbuf,szCmd)
+function RestoreCommand(hbuf,szCmd)
 {
     if(szCmd == "ca")
     {
@@ -1903,7 +1903,7 @@ macro RestoreCommand(hbuf,szCmd)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro SearchForward()
+function SearchForward()
 {
     LoadSearchPattern("#", 1, 0, 1);
     Search_Forward
@@ -1923,7 +1923,7 @@ macro SearchForward()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro SearchBackward()
+function SearchBackward()
 {
     LoadSearchPattern("#", 1, 0, 1);
     Search_Backward
@@ -1943,7 +1943,7 @@ macro SearchBackward()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertFuncName()
+function InsertFuncName()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -1976,7 +1976,7 @@ macro InsertFuncName()
 
 
 *****************************************************************************/
-macro searchstr(str1,str2)
+function searchstr(str1,str2)
 {
 
     j = 0
@@ -2026,7 +2026,7 @@ macro searchstr(str1,str2)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertTraceInfo()
+function InsertTraceInfo()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -2053,7 +2053,7 @@ macro InsertTraceInfo()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertTraceInCurFunction(hbuf,symbol)
+function InsertTraceInCurFunction(hbuf,symbol)
 {
     ln = GetBufLnCur (hbuf)
     symbolname = symbol.Symbol
@@ -2185,7 +2185,7 @@ macro InsertTraceInCurFunction(hbuf,symbol)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetFirstWord(szLine)
+function GetFirstWord(szLine)
 {
     szLine = TrimLeft(szLine)
     nIdx = 0
@@ -2219,7 +2219,7 @@ macro GetFirstWord(szLine)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro AutoInsertTraceInfoInBuf()
+function AutoInsertTraceInfoInBuf()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -2375,7 +2375,7 @@ macro AutoInsertTraceInfoInBuf()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CheckIsCodeBegin(szLine)
+function CheckIsCodeBegin(szLine)
 {
     iLen = strlen(szLine)
     if(iLen == 0)
@@ -2464,7 +2464,7 @@ macro CheckIsCodeBegin(szLine)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro AutoInsertTraceInfoInPrj()
+function AutoInsertTraceInfoInPrj()
 {
     hprj = GetCurrentProj()
     ifileMax = GetProjFileCount (hprj)
@@ -2506,7 +2506,7 @@ macro AutoInsertTraceInfoInPrj()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro RemoveTraceInfo()
+function RemoveTraceInfo()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -2565,7 +2565,7 @@ macro RemoveTraceInfo()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro RemoveCurBufTraceInfo()
+function RemoveCurBufTraceInfo()
 {
     hbuf = GetCurrentBuf()
     isymMax = GetBufSymCount(hbuf)
@@ -2616,7 +2616,7 @@ macro RemoveCurBufTraceInfo()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro RemovePrjTraceInfo()
+function RemovePrjTraceInfo()
 {
     hprj = GetCurrentProj()
     ifileMax = GetProjFileCount (hprj)
@@ -2662,7 +2662,7 @@ macro RemovePrjTraceInfo()
     修改内容   : 修改文件头的日期为当年
 
 *****************************************************************************/
-macro InsertFileHeaderEN(hbuf, ln,szName,szContent)
+function InsertFileHeaderEN(hbuf, ln,szName,szContent)
 {
     
     hnewbuf = newbuf("")
@@ -2793,7 +2793,7 @@ macro InsertFileHeaderEN(hbuf, ln,szName,szContent)
     修改内容   : 修改文件头的日期为当年
 
 *****************************************************************************/
-macro InsertFileHeaderCN(hbuf, ln,szName,szContent)
+function InsertFileHeaderCN(hbuf, ln,szName,szContent)
 {
     hnewbuf = newbuf("")
     if(hnewbuf == hNil)
@@ -2878,7 +2878,7 @@ macro InsertFileHeaderCN(hbuf, ln,szName,szContent)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetFunctionList(hbuf,hnewbuf)
+function GetFunctionList(hbuf,hnewbuf)
 {
     isymMax = GetBufSymCount (hbuf)
     isym = 0
@@ -2929,7 +2929,7 @@ macro GetFunctionList(hbuf,hnewbuf)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertFileList(hbuf,hnewbuf,ln)
+function InsertFileList(hbuf,hnewbuf,ln)
 {
     if(hnewbuf == hNil)
     {
@@ -2971,7 +2971,7 @@ macro InsertFileList(hbuf,hnewbuf,ln)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CommentContent1 (hbuf,ln,szPreStr,szContent,isEnd)
+function CommentContent1 (hbuf,ln,szPreStr,szContent,isEnd)
 {
     //将剪贴板中的多段文本合并
     szClip = MergeString()
@@ -3096,7 +3096,7 @@ macro CommentContent1 (hbuf,ln,szPreStr,szContent,isEnd)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CommentContent (hbuf,ln,szPreStr,szContent,isEnd)
+function CommentContent (hbuf,ln,szPreStr,szContent,isEnd)
 {
     szLeftBlank = szPreStr
     iLen = strlen(szPreStr)
@@ -3247,7 +3247,7 @@ macro CommentContent (hbuf,ln,szPreStr,szContent,isEnd)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro FormatLine()
+function FormatLine()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -3284,7 +3284,7 @@ macro FormatLine()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CreateBlankString(nBlankCount)
+function CreateBlankString(nBlankCount)
 {
     szBlank=""
     nIdx = 0
@@ -3311,7 +3311,7 @@ macro CreateBlankString(nBlankCount)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro TrimLeft(szLine)
+function TrimLeft(szLine)
 {
     nLen = strlen(szLine)
     if(nLen == 0)
@@ -3345,7 +3345,7 @@ macro TrimLeft(szLine)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro TrimRight(szLine)
+function TrimRight(szLine)
 {
     nLen = strlen(szLine)
     if(nLen == 0)
@@ -3379,7 +3379,7 @@ macro TrimRight(szLine)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro TrimString(szLine)
+function TrimString(szLine)
 {
     szLine = TrimLeft(szLine)
     szLIne = TrimRight(szLine)
@@ -3403,7 +3403,7 @@ macro TrimString(szLine)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetFunctionDef(hbuf,symbol)
+function GetFunctionDef(hbuf,symbol)
 {
     ln = symbol.lnName
     szFunc = ""
@@ -3461,7 +3461,7 @@ macro GetFunctionDef(hbuf,symbol)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetWordFromString(hbuf,szLine,nBeg,nEnd,chBeg,chSeparator,chEnd)
+function GetWordFromString(hbuf,szLine,nBeg,nEnd,chBeg,chSeparator,chEnd)
 {
     if((nEnd > strlen(szLine) || (nBeg > nEnd))
     {
@@ -3550,7 +3550,7 @@ macro GetWordFromString(hbuf,szLine,nBeg,nEnd,chBeg,chSeparator,chEnd)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro FuncHeadCommentCN(hbuf, ln, szFunc, szMyName,newFunc)
+function FuncHeadCommentCN(hbuf, ln, szFunc, szMyName,newFunc)
 {
     iIns = 0
     if(newFunc != 1)
@@ -3775,7 +3775,7 @@ macro FuncHeadCommentCN(hbuf, ln, szFunc, szMyName,newFunc)
 
 *****************************************************************************/
 
-macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
+function FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
 {
     iIns = 0
     if(newFunc != 1)
@@ -4175,7 +4175,7 @@ macro FuncHeadCommentEN(hbuf, ln, szFunc, szMyName,newFunc)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertHistory(hbuf,ln,language)
+function InsertHistory(hbuf,ln,language)
 {
     iHistoryCount = 1
 //    isLastLine = ln
@@ -4228,7 +4228,7 @@ macro InsertHistory(hbuf,ln,language)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro UpdateFunctionList()
+function UpdateFunctionList()
 {
     hnewbuf = newbuf("")
     if(hnewbuf == hNil)
@@ -4291,7 +4291,7 @@ macro UpdateFunctionList()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro  InsertHistoryContentCN(hbuf,ln,iHostoryCount)
+function  InsertHistoryContentCN(hbuf,ln,iHostoryCount)
 {
     //获取时间
     SysTime = GetSysTime(1);
@@ -4381,7 +4381,7 @@ macro  InsertHistoryContentCN(hbuf,ln,iHostoryCount)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro  InsertHistoryContentEN(hbuf,ln,iHostoryCount)
+function  InsertHistoryContentEN(hbuf,ln,iHostoryCount)
 {
     SysTime = GetSysTime(1);
     szTime = SysTime.Date
@@ -4430,7 +4430,7 @@ macro  InsertHistoryContentEN(hbuf,ln,iHostoryCount)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CreateFunctionDef(hbuf, szName, language)
+function CreateFunctionDef(hbuf, szName, language)
 {
     ln = 0
 
@@ -4534,7 +4534,7 @@ macro CreateFunctionDef(hbuf, szName, language)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetLeftWord(szLine,ichRight)
+function GetLeftWord(szLine,ichRight)
 {
     if(ich == 0)
     {
@@ -4584,7 +4584,7 @@ macro GetLeftWord(szLine,ichRight)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CreateClassPrototype(hbuf,ln,symbol)
+function CreateClassPrototype(hbuf,ln,symbol)
 {
     isLastLine = 0
     fIsEnd = 1
@@ -4667,7 +4667,7 @@ macro CreateClassPrototype(hbuf,ln,symbol)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CreateFuncPrototype(hbuf,ln,szType,symbol)
+function CreateFuncPrototype(hbuf,ln,szType,symbol)
 {
     isLastLine = 0
     hOutbuf = GetCurrentBuf()
@@ -4741,7 +4741,7 @@ macro CreateFuncPrototype(hbuf,ln,szType,symbol)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CreateNewHeaderFile()
+function CreateNewHeaderFile()
 {
     hbuf = GetCurrentBuf()
     language = getreg(LANGUAGE)
@@ -4866,7 +4866,7 @@ macro CreateNewHeaderFile()
         wordinfo.ich = the first ich of the word
         wordinfo.ichLim = the limit ich of the word
 -------------------------------------------------------------------------*/
-macro GetWordLeftOfIch(ich, sz)
+function GetWordLeftOfIch(ich, sz)
 {
     wordinfo = "" // create a "wordinfo" structure
     
@@ -4928,7 +4928,7 @@ macro GetWordLeftOfIch(ich, sz)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ReplaceBufTab()
+function ReplaceBufTab()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -4958,7 +4958,7 @@ macro ReplaceBufTab()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ReplaceTabInProj()
+function ReplaceTabInProj()
 {
     hprj = GetCurrentProj()
     ifileMax = GetProjFileCount (hprj)
@@ -5011,7 +5011,7 @@ macro ReplaceTabInProj()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ReplaceInBuf(hbuf,chOld,chNew,nBeg,nEnd,fMatchCase, fRegExp, fWholeWordsOnly, fConfirm)
+function ReplaceInBuf(hbuf,chOld,chNew,nBeg,nEnd,fMatchCase, fRegExp, fWholeWordsOnly, fConfirm)
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -5055,7 +5055,7 @@ macro ReplaceInBuf(hbuf,chOld,chNew,nBeg,nEnd,fMatchCase, fRegExp, fWholeWordsOn
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ConfigureSystem()
+function ConfigureSystem()
 {
     szLanguage = ASK("Please select language: 0 Chinese ,1 English");
     if(szLanguage == "#")
@@ -5093,7 +5093,7 @@ macro ConfigureSystem()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetLeftBlank(szLine)
+function GetLeftBlank(szLine)
 {
     nIdx = 0
     nEndIdx = strlen(szLine)
@@ -5122,7 +5122,7 @@ macro GetLeftBlank(szLine)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ExpandBraceLittle()
+function ExpandBraceLittle()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5157,7 +5157,7 @@ macro ExpandBraceLittle()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ExpandBraceMid()
+function ExpandBraceMid()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5192,7 +5192,7 @@ macro ExpandBraceMid()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ExpandBraceLarge()
+function ExpandBraceLarge()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5346,7 +5346,7 @@ macro ExpandBraceLarge()
 }
 
 /*
-macro ScanStatement(szLine,iBeg)
+function ScanStatement(szLine,iBeg)
 {
     nIdx = 0
     iLen = strlen(szLine)
@@ -5382,7 +5382,7 @@ macro ScanStatement(szLine,iBeg)
 }
 */
 /*
-macro MoveCommentLeftBlank(szLine)
+function MoveCommentLeftBlank(szLine)
 {
     nIdx  = 0
     iLen = strlen(szLine)
@@ -5441,7 +5441,7 @@ macro MoveCommentLeftBlank(szLine)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro DelCompoundStatement()
+function DelCompoundStatement()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5538,7 +5538,7 @@ macro DelCompoundStatement()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CheckBlockBrace(hbuf)
+function CheckBlockBrace(hbuf)
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5602,7 +5602,7 @@ macro CheckBlockBrace(hbuf)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro SearchCompoundEnd(hbuf,ln,ichBeg)
+function SearchCompoundEnd(hbuf,ln,ichBeg)
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5654,7 +5654,7 @@ macro SearchCompoundEnd(hbuf,ln,ichBeg)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro CheckBrace(szLine,ichBeg,ichEnd,chBeg,chEnd,nCheckCount,isCommentEnd)
+function CheckBrace(szLine,ichBeg,ichEnd,chBeg,chEnd,nCheckCount,isCommentEnd)
 {
     retVal = ""
     retVal.ich = 0
@@ -5725,7 +5725,7 @@ macro CheckBrace(szLine,ichBeg,ichEnd,chBeg,chEnd,nCheckCount,isCommentEnd)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertElse()
+function InsertElse()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5763,7 +5763,7 @@ macro InsertElse()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertCase()
+function InsertCase()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5792,7 +5792,7 @@ macro InsertCase()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertSwitch()
+function InsertSwitch()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5825,7 +5825,7 @@ macro InsertSwitch()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertMultiCaseProc(hbuf,szLeft,nSwitch)
+function InsertMultiCaseProc(hbuf,szLeft,nSwitch)
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -5897,7 +5897,7 @@ macro InsertMultiCaseProc(hbuf,szLeft,nSwitch)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetSwitchVar(szLine)
+function GetSwitchVar(szLine)
 {
     if( (szLine == "{") || (szLine == "}") )
     {
@@ -5924,7 +5924,7 @@ macro GetSwitchVar(szLine)
 }
 
 /*
-macro SkipControlCharFromString(szLine)
+function SkipControlCharFromString(szLine)
 {
    nLen = strlen(szLine)
    nIdx = 0
@@ -5962,7 +5962,7 @@ macro SkipControlCharFromString(szLine)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro SkipCommentFromString(szLine,isCommentEnd)
+function SkipCommentFromString(szLine,isCommentEnd)
 {
     RetVal = ""
     fIsEnd = 1
@@ -6029,7 +6029,7 @@ macro SkipCommentFromString(szLine,isCommentEnd)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertDo()
+function InsertDo()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -6067,7 +6067,7 @@ macro InsertDo()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertWhile()
+function InsertWhile()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -6104,7 +6104,7 @@ macro InsertWhile()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertFor()
+function InsertFor()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -6148,7 +6148,7 @@ macro InsertFor()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertIf()
+function InsertIf()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -6185,7 +6185,7 @@ macro InsertIf()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro MergeString()
+function MergeString()
 {
     hbuf = newbuf("clip")
     if(hbuf == hNil)
@@ -6243,7 +6243,7 @@ macro MergeString()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ClearPrombleNo()
+function ClearPrombleNo()
 {
    SetReg ("PNO", "")
 }
@@ -6262,7 +6262,7 @@ macro ClearPrombleNo()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro AddPromblemNo()
+function AddPromblemNo()
 {
     szQuestion = ASK("Please Input problem number ");
     if(szQuestion == "#")
@@ -6312,7 +6312,7 @@ for example:
     修改内容   : 新生成函数,支持块注释
 
 *****************************************************************************/
-macro ComentCPPtoC()
+function ComentCPPtoC()
 {
     hwnd = GetCurrentWnd()
     hbuf = GetCurrentBuf()
@@ -6466,7 +6466,7 @@ macro ComentCPPtoC()
 }
 
 
-macro ComentLine()
+function ComentLine()
 {
     hwnd = GetCurrentWnd()
     hbuf = GetCurrentBuf()
@@ -6525,7 +6525,7 @@ macro ComentLine()
     修改内容   : 修改了注释嵌套所产生的问题
 
 *****************************************************************************/
-macro CmtCvtLine(lnCurrent, isCommentEnd)
+function CmtCvtLine(lnCurrent, isCommentEnd)
 {
     hbuf = GetCurrentBuf()
     szLine = GetBufLine(hbuf,lnCurrent)
@@ -6597,7 +6597,7 @@ macro CmtCvtLine(lnCurrent, isCommentEnd)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetFileNameExt(sz)
+function GetFileNameExt(sz)
 {
     i = 1
     j = 0
@@ -6633,7 +6633,7 @@ macro GetFileNameExt(sz)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetFileNameNoExt(sz)
+function GetFileNameNoExt(sz)
 {
     i = 1
     szName = sz
@@ -6673,7 +6673,7 @@ macro GetFileNameNoExt(sz)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetFileName(sz)
+function GetFileName(sz)
 {
     i = 1
     szName = sz
@@ -6706,7 +6706,7 @@ macro GetFileName(sz)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsIfdef()
+function InsIfdef()
 {
     sz = Ask("Enter #ifdef condition:")
     if (sz != "")
@@ -6727,7 +6727,7 @@ macro InsIfdef()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsIfndef()
+function InsIfndef()
 {
     sz = Ask("Enter #ifndef condition:")
     if (sz != "")
@@ -6750,7 +6750,7 @@ macro InsIfndef()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertCPP(hbuf,ln)
+function InsertCPP(hbuf,ln)
 {
     InsBufLine(hbuf, ln, "")
     InsBufLine(hbuf, ln, "#endif /* __cplusplus */")
@@ -6789,7 +6789,7 @@ macro InsertCPP(hbuf,ln)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro ReviseCommentProc(hbuf,ln,szCmd,szMyName,szLine1)
+function ReviseCommentProc(hbuf,ln,szCmd,szMyName,szLine1)
 {
     if (szCmd == "ap")
     {   
@@ -7030,7 +7030,7 @@ macro ReviseCommentProc(hbuf,ln,szCmd,szMyName,szLine1)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertReviseAdd()
+function InsertReviseAdd()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -7113,7 +7113,7 @@ macro InsertReviseAdd()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertReviseDel()
+function InsertReviseDel()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -7195,7 +7195,7 @@ macro InsertReviseDel()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertReviseMod()
+function InsertReviseMod()
 {
     hwnd = GetCurrentWnd()
     sel = GetWndSel(hwnd)
@@ -7265,7 +7265,7 @@ macro InsertReviseMod()
 }
 
 // Wrap ifdef <sz> .. endif around the current selection
-macro IfdefStr(sz)
+function IfdefStr(sz)
 {
     hwnd = GetCurrentWnd()
     lnFirst = GetWndSelLnFirst(hwnd)
@@ -7312,7 +7312,7 @@ macro IfdefStr(sz)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro IfndefStr(sz)
+function IfndefStr(sz)
 {
     hwnd = GetCurrentWnd()
     lnFirst = GetWndSelLnFirst(hwnd)
@@ -7359,7 +7359,7 @@ macro IfndefStr(sz)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro InsertPredefIf()
+function InsertPredefIf()
 {
     sz = Ask("Enter #if condition:")
     PredefIfStr(sz)
@@ -7380,7 +7380,7 @@ macro InsertPredefIf()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro PredefIfStr(sz)
+function PredefIfStr(sz)
 {
     hwnd = GetCurrentWnd()
     lnFirst = GetWndSelLnFirst(hwnd)
@@ -7428,7 +7428,7 @@ macro PredefIfStr(sz)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro HeadIfdefStr(sz)
+function HeadIfdefStr(sz)
 {
     hwnd = GetCurrentWnd()
     lnFirst = GetWndSelLnFirst(hwnd)
@@ -7456,7 +7456,7 @@ macro HeadIfdefStr(sz)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetSysTime(a)
+function GetSysTime(a)
 {
     //从sidate取得时间
     RunCmd ("sidate")
@@ -7500,7 +7500,7 @@ macro GetSysTime(a)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro HeaderFileCreate()
+function HeaderFileCreate()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -7536,7 +7536,7 @@ macro HeaderFileCreate()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro FunctionHeaderCreate()
+function FunctionHeaderCreate()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)
@@ -7604,7 +7604,7 @@ macro FunctionHeaderCreate()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetVersion()
+function GetVersion()
 {
    Record = GetProgramInfo ()
    return Record.versionMajor
@@ -7624,7 +7624,7 @@ macro GetVersion()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro GetProgramInfo ()
+function GetProgramInfo ()
 {   
     Record = ""
     Record.versionMajor     = 2
@@ -7646,7 +7646,7 @@ macro GetProgramInfo ()
     修改内容   : 新生成函数
 
 *****************************************************************************/
-macro FileHeaderCreate()
+function FileHeaderCreate()
 {
     hwnd = GetCurrentWnd()
     if (hwnd == 0)

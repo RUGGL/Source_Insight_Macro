@@ -32,7 +32,7 @@
 //   0 - 字符串相等
 //   <0 - s1 < s2
 //   >0 - s1 > s2
-macro strcmp(s1, s2)
+function strcmp(s1, s2)
 {
     len1 = strlen(s1)
     len2 = strlen(s2)
@@ -70,7 +70,7 @@ macro strcmp(s1, s2)
 //   0 - 字符串前n个字符相等
 //   <0 - s1 < s2 (在前n个字符内)
 //   >0 - s1 > s2 (在前n个字符内)
-macro strncmp(s1, s2, n)
+function strncmp(s1, s2, n)
 {
     len1 = strlen(s1)
     len2 = strlen(s2)
@@ -129,7 +129,7 @@ macro strncmp(s1, s2, n)
 //   0 - 字符串相等（忽略大小写）
 //   <0 - s1 < s2（忽略大小写）
 //   >0 - s1 > s2（忽略大小写）
-macro stricmp(s1, s2)
+function stricmp(s1, s2)
 {
     len1 = strlen(s1)
     len2 = strlen(s2)
@@ -174,7 +174,7 @@ macro stricmp(s1, s2)
 
 // strchr - 查找字符在字符串中第一次出现的位置
 // 返回: 字符位置的索引，未找到返回-1
-macro strchr(s, ch)
+function strchr(s, ch)
 {
     len = strlen(s)
     i = 0
@@ -196,7 +196,7 @@ macro strchr(s, ch)
 
 // strrchr - 查找字符在字符串中最后一次出现的位置
 // 返回: 字符位置的索引，未找到返回-1
-macro strrchr(s, ch)
+function strrchr(s, ch)
 {
     len = strlen(s)
     i = len - 1
@@ -218,7 +218,7 @@ macro strrchr(s, ch)
 
 // strstr - 查找子串在字符串中第一次出现的位置
 // 返回: 子串开始位置的索引，未找到返回-1
-macro strstr(haystack, needle)
+function strstr(haystack, needle)
 {
     haystack_len = strlen(haystack)
     needle_len = strlen(needle)
@@ -272,7 +272,7 @@ macro strstr(haystack, needle)
 
 // strpbrk - 查找字符串中第一个匹配指定字符集中任意字符的位置
 // 返回: 字符位置的索引，未找到返回-1
-macro strpbrk(s, accept)
+function strpbrk(s, accept)
 {
     s_len = strlen(s)
     accept_len = strlen(accept)
@@ -318,13 +318,13 @@ macro strpbrk(s, accept)
 
 // strcpy - 字符串拷贝（模拟，返回新字符串）
 // 注意: Source Insight宏不能修改参数，所以返回新字符串
-macro strcpy(dest, src)
+function strcpy(dest, src)
 {
     return src  // 直接返回源字符串
 }
 
 // strncpy - 字符串拷贝n个字符（模拟，返回新字符串）
-macro strncpy(dest, src, n)
+function strncpy(dest, src, n)
 {
     src_len = strlen(src)
     
@@ -354,13 +354,13 @@ macro strncpy(dest, src, n)
 }
 
 // strcat - 字符串连接（模拟，返回新字符串）
-macro strcat(dest, src)
+function strcat(dest, src)
 {
     return cat(dest, src)  // 使用基础宏的cat函数
 }
 
 // strncat - 字符串连接n个字符（模拟，返回新字符串）
-macro strncat(dest, src, n)
+function strncat(dest, src, n)
 {
     src_len = strlen(src)
     
@@ -389,7 +389,7 @@ macro strncat(dest, src, n)
 
 // strspn - 计算字符串开头连续包含指定字符集中字符的个数
 // 返回: 匹配的字符数
-macro strspn(s, accept)
+function strspn(s, accept)
 {
     s_len = strlen(s)
     accept_len = strlen(accept)
@@ -439,7 +439,7 @@ macro strspn(s, accept)
 
 // strcspn - 计算字符串开头连续不包含指定字符集中字符的个数
 // 返回: 不匹配的字符数
-macro strcspn(s, reject)
+function strcspn(s, reject)
 {
     s_len = strlen(s)
     reject_len = strlen(reject)
@@ -490,7 +490,7 @@ macro strcspn(s, reject)
 // strtok - 字符串分割（简化版，单次调用）
 // 注意: 由于Source Insight没有静态变量，这是一个简化实现
 // 返回: 第一个分割出的令牌，或空字符串
-macro strtok_simple(s, delim)
+function strtok_simple(s, delim)
 {
     s_len = strlen(s)
     if (s_len == 0)
@@ -521,7 +521,7 @@ macro strtok_simple(s, delim)
 
 // isalpha - 检查字符是否为字母
 // 返回: TRUE(1)或FALSE(0)
-macro isalpha(ch)
+function isalpha(ch)
 {
     if (strlen(ch) == 0)
     {
@@ -543,7 +543,7 @@ macro isalpha(ch)
 
 // isdigit - 检查字符是否为数字
 // 返回: TRUE(1)或FALSE(0)
-macro isdigit(ch)
+function isdigit(ch)
 {
     if (strlen(ch) == 0)
     {
@@ -564,7 +564,7 @@ macro isdigit(ch)
 
 // isalnum - 检查字符是否为字母或数字
 // 返回: TRUE(1)或FALSE(0)
-macro isalnum(ch)
+function isalnum(ch)
 {
     if (isalpha(ch))
     {
@@ -575,7 +575,7 @@ macro isalnum(ch)
 
 // isspace - 检查字符是否为空白字符
 // 返回: TRUE(1)或FALSE(0)
-macro isspace(ch)
+function isspace(ch)
 {
     if (strlen(ch) == 0)
     {
@@ -619,7 +619,7 @@ macro isspace(ch)
 
 // strrev - 反转字符串
 // 返回: 反转后的字符串
-macro strrev(s)
+function strrev(s)
 {
     len = strlen(s)
     if (len <= 1)
@@ -640,7 +640,7 @@ macro strrev(s)
 
 // strtrim - 去除字符串两端的空白字符
 // 返回: 去除空白后的字符串
-macro strtrim(s)
+function strtrim(s)
 {
     len = strlen(s)
     
@@ -689,7 +689,7 @@ macro strtrim(s)
 
 // contains_special_chars - 检查字符串是否包含控制字符
 // 返回: TRUE(1)或FALSE(0)
-macro contains_special_chars(s)
+function contains_special_chars(s)
 {
     len = strlen(s)
     i = 0
@@ -710,7 +710,7 @@ macro contains_special_chars(s)
 
 // is_printable_char - 检查字符是否可打印
 // 返回: TRUE(1)或FALSE(0)
-macro is_printable_char(ch)
+function is_printable_char(ch)
 {
     if (strlen(ch) == 0)
     {
@@ -733,7 +733,7 @@ macro is_printable_char(ch)
 
 // unescape_string - 将转义序列转换回控制字符（简化版）
 // 注意：这个函数不能处理所有转义序列，是简化实现
-macro unescape_string(s)
+function unescape_string(s)
 {
     len = strlen(s)
     result = ""
@@ -853,7 +853,7 @@ macro unescape_string(s)
 // get_line_count - 获取字符串中的行数，以\n为行结束标志
 // 末尾行不以\n结尾也算一行
 // 返回: 行数
-macro get_line_count(s)
+function get_line_count(s)
 {
     len = strlen(s)
     if (len == 0)
@@ -880,7 +880,7 @@ macro get_line_count(s)
 
 // find_first_non_printable - 查找第一个非打印字符的索引（正向）
 // 返回: 索引位置，未找到返回-1
-macro find_first_non_printable(s)
+function find_first_non_printable(s)
 {
     len = strlen(s)
     i = 0
@@ -900,7 +900,7 @@ macro find_first_non_printable(s)
 
 // find_last_non_printable - 查找最后一个非打印字符的索引（反向）
 // 返回: 索引位置，未找到返回-1
-macro find_last_non_printable(s)
+function find_last_non_printable(s)
 {
     len = strlen(s)
     i = len - 1
@@ -920,7 +920,7 @@ macro find_last_non_printable(s)
 
 // find_first_line_with_string - 查找包含指定字符串的行号（正向）
 // 返回: 行号（从1开始），未找到返回0
-macro find_first_line_with_string(s, search)
+function find_first_line_with_string(s, search)
 {
     len = strlen(s)
     if (len == 0 || strlen(search) == 0)
@@ -997,7 +997,7 @@ macro find_first_line_with_string(s, search)
 
 // find_last_line_with_string_simple - 查找包含指定字符串的行号（反向，简化版）
 // 返回: 行号（从1开始），未找到返回0
-macro find_last_line_with_string_simple(s, search)
+function find_last_line_with_string_simple(s, search)
 {
     len = strlen(s)
     search_len = strlen(search)
@@ -1029,7 +1029,7 @@ macro find_last_line_with_string_simple(s, search)
 
 // get_line_content - 获取指定行内容
 // 返回: 整行字符，从上一行换行符(不含)开始到本行换行符(包含)或结束
-macro get_line_content(s, line_num)
+function get_line_content(s, line_num)
 {
     len = strlen(s)
     if (len == 0 || line_num < 1)
@@ -1071,7 +1071,7 @@ macro get_line_content(s, line_num)
 
 // insert_at_line - 在指定行插入字符串
 // 返回: 插入后的新字符串
-macro insert_at_line(s, line_num, insert_str)
+function insert_at_line(s, line_num, insert_str)
 {
     total_lines = get_line_count(s)
     
@@ -1148,109 +1148,111 @@ macro insert_at_line(s, line_num, insert_str)
 
 // delete_line - 删除指定行
 // 返回: 删除后的新字符串
-macro delete_line(s, line_num)
-{
-    total_lines = get_line_count(s)
+// 无法正常使用,会报错,因此注释
+//macro delete_line(s, line_num)
+//{
+//    total_lines = get_line_count(s)
     
-    if (line_num < 1 || line_num > total_lines)
-    {
-        return s  // 无效行号，返回原字符串
-    }
+//    if (line_num < 1 || line_num > total_lines)
+//    {
+//        return s  // 无效行号，返回原字符串
+//    }
     
-    len = strlen(s)
-    if (len == 0)
-    {
-        return s  // 空字符串
-    }
+//    len = strlen(s)
+//    if (len == 0)
+//    {
+//        return s  // 空字符串
+//    }
     
-    current_line = 1
-    line_start = 0
-    i = 0
+//    current_line = 1
+//    line_start = 0
+//    i = 0
     
-    while (i < len)
-    {
-        ch = s[i]
-        ascii = AsciiFromChar(ch)
+//    while (i < len)
+//    {
+//        ch = s[i]
+//        ascii = AsciiFromChar(ch)
         
-        if (ascii == 10)  // 换行符
-        {
-            if (current_line == line_num)
-            {
-                // 删除这一行（从line_start到i，包括换行符）
-                // 计算删除的结束位置
-                delete_end = i
+//        if (ascii == 10)  // 换行符
+//        {
+//            if (current_line == line_num)
+//            {
+//                // 删除这一行（从line_start到i，包括换行符）
+//                // 计算删除的结束位置
+//                delete_end = i
                 
-                // 如果是最后一行且后面没有换行符？
-                if (i == len - 1)
-                {
-                    // 这是最后一行，且以换行符结尾
-                    delete_end = i  // 包括换行符
-                }
+//                // 如果是最后一行且后面没有换行符？
+//                if (i == len - 1)
+//                {
+//                    // 这是最后一行，且以换行符结尾
+//                    delete_end = i  // 包括换行符
+//                }
                 
-                // 构建结果
-                if (line_start == 0)
-                {
-                    // 删除第一行
-                    after = strmid(s, delete_end + 1, len)
-                    return after
-                }
-                else
-                {
-                    // 删除中间行
-                    before = strmid(s, 0, line_start)
-                    after = strmid(s, delete_end + 1, len)
-                    return cat(before, after)
-                }
-            }
-            current_line = current_line + 1
-            line_start = i + 1
-        }
+//                // 构建结果
+//                if (line_start == 0)
+//                {
+//                    // 删除第一行
+//                    after = strmid(s, delete_end + 1, len)
+//                    return after
+//                }
+//                else
+//                {
+//                    // 删除中间行
+//                    before = strmid(s, 0, line_start)
+//                    after = strmid(s, delete_end + 1, len)
+//                    return cat(before, after)
+//                }
+//            }
+//            current_line = current_line + 1
+//            line_start = i + 1
+//        }
         
-        i = i + 1
-    }
+//        i = i + 1
+//    }
     
-    // 处理最后一行（不以换行符结尾）
-    if (current_line == line_num)
-    {
-        // 删除最后一行
-        if (line_start == 0)
-        {
-            return ""  // 删除唯一一行
-        }
-        else
-        {
-            // 返回除了最后一行之外的所有内容
-            // 需要找到前一行的换行符
-            prev_nl = line_start - 1
-            found_nl = 0
-            while (prev_nl >= 0)
-            {
-                if (AsciiFromChar(s[prev_nl]) == 10)
-                {
-                    found_nl = 1
-                    break
-                }
-                prev_nl = prev_nl - 1
-            }
+//    // 处理最后一行（不以换行符结尾）
+//    if (current_line == line_num)
+//    {
+//        // 删除最后一行
+//        if (line_start == 0)
+//        {
+//            return ""  // 删除唯一一行
+//        }
+//        else
+//        {
+//            // 返回除了最后一行之外的所有内容
+//            // 需要找到前一行的换行符
+//            prev_nl = line_start - 1
+//            found_nl = 0
+//            while (prev_nl >= 0)
+//            {
+//                if (AsciiFromChar(s[prev_nl]) == 10)
+//                {
+//                    found_nl = 1
+//                    break
+//                }
+//                prev_nl = prev_nl - 1
+//            }
             
-            if (found_nl == 1)
-            {
-                return strmid(s, 0, prev_nl + 1)
-            }
-            else
-            {
-                return ""  // 只剩一行了
-            }
-        }
-    }
+//            if (found_nl == 1)
+//            {
+//                return strmid(s, 0, prev_nl + 1)
+//            }
+//            else
+//            {
+//                return ""  // 只剩一行了
+//            }
+//        }
+//    }
     
-    return s
-}
+//    return s
+//}
+
 
 // 为了完整，让我也提供一个更简单的删除行实现
 // delete_line_simple - 删除指定行（简化版本）
 // 返回: 删除后的新字符串
-macro delete_line_simple(s, line_num)
+function delete_line_simple(s, line_num)
 {
     total_lines = get_line_count(s)
     
@@ -1317,7 +1319,7 @@ macro delete_line_simple(s, line_num)
 // replace_line - 替换指定行内容
 // 新字符串可以是多行字符串，中间可以包含换行符
 // 返回: 替换后的新字符串
-macro replace_line(s, line_num, new_content)
+function replace_line(s, line_num, new_content)
 {
     total_lines = get_line_count(s)
     
@@ -1331,17 +1333,11 @@ macro replace_line(s, line_num, new_content)
     return insert_at_line(temp, line_num, new_content)
 }
 
-// strchr_reverse - 从后往前查找字符在字符串中第一次出现的位置
-// 返回: 索引位置，未找到返回-1
-macro strchr_reverse(s, ch)
-{
-    return strrchr(s, ch)  // strrchr就是从后往前找
-}
 
 // strrchr_reverse - 从后往前查找字符串在字符串中第一次出现的位置
 // 实际上是查找子串最后一次出现的位置
 // 返回: 索引位置，未找到返回-1
-macro strrchr_reverse(s, substr)
+function strrchr_reverse(s, substr)
 {
     len = strlen(s)
     sublen = strlen(substr)
@@ -1359,19 +1355,19 @@ macro strrchr_reverse(s, substr)
     i = len - sublen
     while (i >= 0)
     {
-        match = 1
         j = 0
-        while (j < sublen)
-        {
-            if (AsciiFromChar(s[i + j]) != AsciiFromChar(substr[j]))
+        if (AsciiFromChar(s[i + 0]) = AsciiFromChar(substr[0])){
+
+            while (j < sublen)
             {
-                match = 0
-                break
+                if (AsciiFromChar(s[i + j]) != AsciiFromChar(substr[j]))
+                {
+                    break
+                }
+                j = j + 1
             }
-            j = j + 1
         }
-        
-        if (match == 1)
+        if (j == sublen)
         {
             return i
         }
@@ -1384,7 +1380,7 @@ macro strrchr_reverse(s, substr)
 
 // insert_at_position - 在字符串指定位置插入字符串（正向位置）
 // 返回: 插入后的新字符串
-macro insert_at_position(s, position, insert_str)
+function insert_at_position(s, position, insert_str)
 {
     len = strlen(s)
     
@@ -1417,7 +1413,7 @@ macro insert_at_position(s, position, insert_str)
 // insert_at_position_reverse - 在字符串指定位置插入字符串（反向位置）
 // position从末尾开始计算，0表示末尾
 // 返回: 插入后的新字符串
-macro insert_at_position_reverse(s, position, insert_str)
+function insert_at_position_reverse(s, position, insert_str)
 {
     len = strlen(s)
     
@@ -1437,7 +1433,7 @@ macro insert_at_position_reverse(s, position, insert_str)
 
 // delete_at_position - 在字符串指定位置删除指定长度字符（正向位置）
 // 返回: 删除后的新字符串
-macro delete_at_position(s, position, length)
+function delete_at_position(s, position, length)
 {
     len = strlen(s)
     
@@ -1465,7 +1461,7 @@ macro delete_at_position(s, position, length)
 // delete_at_position_reverse - 在字符串指定位置删除指定长度字符（反向位置）
 // position从末尾开始计算，0表示末尾
 // 返回: 删除后的新字符串
-macro delete_at_position_reverse(s, position, length)
+function delete_at_position_reverse(s, position, length)
 {
     len = strlen(s)
     
@@ -1491,7 +1487,7 @@ macro delete_at_position_reverse(s, position, length)
 
 // replace_at_position - 在字符串指定位置替换字符串（正向位置）
 // 返回: 替换后的新字符串
-macro replace_at_position(s, position, length, new_str)
+function replace_at_position(s, position, length, new_str)
 {
     // 先删除，再插入
     temp = delete_at_position(s, position, length)
@@ -1501,7 +1497,7 @@ macro replace_at_position(s, position, length, new_str)
 // replace_at_position_reverse - 在字符串指定位置替换字符串（反向位置）
 // position从末尾开始计算，0表示末尾
 // 返回: 替换后的新字符串
-macro replace_at_position_reverse(s, position, length, new_str)
+function replace_at_position_reverse(s, position, length, new_str)
 {
     len = strlen(s)
     
@@ -1527,7 +1523,7 @@ macro replace_at_position_reverse(s, position, length, new_str)
 
 // get_substring - 获取指定长度的字符串（正向）
 // 返回: 从指定位置开始的指定长度子串
-macro get_substring(s, position, length)
+function get_substring(s, position, length)
 {
     len = strlen(s)
     
@@ -1552,7 +1548,7 @@ macro get_substring(s, position, length)
 // get_substring_reverse - 获取指定长度的字符串（反向）
 // 从末尾开始获取指定长度的子串
 // 返回: 子串
-macro get_substring_reverse(s, length)
+function get_substring_reverse(s, length)
 {
     len = strlen(s)
     
@@ -1572,7 +1568,7 @@ macro get_substring_reverse(s, length)
 
 // replace_first - 单次替换，用A字符串替换原字符串中的首次匹配到的B字符串（正向）
 // 返回: 替换后的新字符串
-macro replace_first(s, old_str, new_str)
+function replace_first(s, old_str, new_str)
 {
     pos = strstr(s, old_str)
     if (pos == -1)
@@ -1586,7 +1582,7 @@ macro replace_first(s, old_str, new_str)
 // replace_first_reverse - 单次替换，用A字符串替换原字符串中的首次匹配到的B字符串（反向）
 // 从末尾开始查找第一次匹配
 // 返回: 替换后的新字符串
-macro replace_first_reverse(s, old_str, new_str)
+function replace_first_reverse(s, old_str, new_str)
 {
     pos = strrchr_reverse(s, old_str)
     if (pos == -1)
@@ -1599,7 +1595,7 @@ macro replace_first_reverse(s, old_str, new_str)
 
 // replace_all - 全部替换，用A字符串替换原字符串中的所有匹配到的B字符串
 // 返回: 替换后的新字符串
-macro replace_all(s, old_str, new_str)
+function replace_all(s, old_str, new_str)
 {
     result = s
     old_len = strlen(old_str)
@@ -1629,13 +1625,32 @@ macro replace_all(s, old_str, new_str)
     return result
 }
 
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 测试函数（修复版，使用实际换行符）
+/////////////////////////////////////////////////////////////////////////////
+// 主测试函数（修复版）
+macro main_test_fixed()
+{
+    msg "开始测试字符串函数库（修复版）..."
+    msg "========================================"
+    
+    test_new_functions_fixed()
+    msg "========================================"
+    test_delete_line_edge_cases()
+    msg "========================================"
+    test_complex_string()
+    
+    msg "所有测试完成！"
+}
 /////////////////////////////////////////////////////////////////////////////
 // 工具函数：创建包含换行符的测试字符串
 /////////////////////////////////////////////////////////////////////////////
 
 // create_test_string_with_newlines - 创建包含换行符的测试字符串
 // 使用CharFromAscii(10)创建换行符，避免转义问题
-macro create_test_string_with_newlines()
+function create_test_string_with_newlines()
 {
     // 使用实际的换行符（ASCII 10）而不是"\n"
     newline = CharFromAscii(10)
@@ -1654,7 +1669,7 @@ macro create_test_string_with_newlines()
 }
 
 // create_complex_test_string - 创建复杂测试字符串
-macro create_complex_test_string()
+function create_complex_test_string()
 {
     newline = CharFromAscii(10)
     carriage_return = CharFromAscii(13)
@@ -1669,12 +1684,9 @@ macro create_complex_test_string()
     return str
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// 测试函数（修复版，使用实际换行符）
-/////////////////////////////////////////////////////////////////////////////
 
 // test_complex_string - 测试复杂字符串
-macro test_complex_string()
+function test_complex_string()
 {
     msg "=== 测试复杂字符串 ==="
     
@@ -1721,66 +1733,8 @@ macro test_complex_string()
     msg "=== 复杂字符串测试结束 ==="
 }
 
-
-// 简单演示函数
-macro demo_line_functions()
-{
-    msg "=== 演示行操作函数 ==="
-    
-    // 创建多行字符串
-    newline = CharFromAscii(10)
-    multi_line = "第一行"
-    multi_line = cat(multi_line, newline)
-    multi_line = cat(multi_line, "第二行")
-    multi_line = cat(multi_line, newline)
-    multi_line = cat(multi_line, "第三行")
-    
-    msg "原始字符串:"
-    msg "长度: " # strlen(multi_line)
-    msg "行数: " # get_line_count(multi_line) # " (期望: 3)"
-    
-    // 显示各行内容
-    msg "各行内容:"
-    i = 1
-    while (i <= get_line_count(multi_line))
-    {
-        line = get_line_content(multi_line, i)
-        msg "第 " # i # " 行: \"" # line # "\""
-        i = i + 1
-    }
-    
-    // 测试查找
-    line_with_second = find_first_line_with_string(multi_line, "第二")
-    msg "包含'第二'的行号: " # line_with_second # " (期望: 2)"
-    
-    // 测试插入
-    inserted = insert_at_line(multi_line, 2, "插入的行" # newline)
-    msg "插入后行数: " # get_line_count(inserted) # " (期望: 4)"
-    
-    msg "=== 演示结束 ==="
-}
-
-// 快速测试
-macro quick_test_fixed()
-{
-    msg "快速测试（修复版）:"
-    
-    // 使用实际换行符
-    newline = CharFromAscii(10)
-    test_str = "第一行"
-    test_str = cat(test_str, newline)
-    test_str = cat(test_str, "第二行")
-    test_str = cat(test_str, newline)
-    test_str = cat(test_str, "第三行")
-    
-    msg "1. 测试字符串长度: " # strlen(test_str)
-    msg "2. 行数: " # get_line_count(test_str) # " (期望: 3)"
-    msg "3. 第2行内容: \"" # get_line_content(test_str, 2) # "\""
-    msg "4. 包含'第二'的行: " # find_first_line_with_string(test_str, "第二") # " (期望: 2)"
-}
-
 // test_new_functions_fixed - 测试新增函数（使用实际换行符）
-macro test_new_functions_fixed()
+function test_new_functions_fixed()
 {
     msg "=== 测试新增函数（使用实际换行符） ==="
     
@@ -1856,12 +1810,7 @@ macro test_new_functions_fixed()
         msg "删除后第3行: \"" # get_line_content(deleted, 3) # "\""
     }
     
-    // 7. 测试delete_line（原始版本）
-    msg "--- 测试delete_line（原始版本） ---"
-    deleted2 = delete_line(test_str, 2)
-    deleted2_lines = get_line_count(deleted2)
-    msg "原始版本删除第2行后的行数: " # deleted2_lines # " (期望: 4)"
-    
+
     // 8. 测试replace_first
     msg "--- 测试replace_first ---"
     replaced = replace_first("abc def abc ghi", "abc", "XYZ")
@@ -1881,7 +1830,7 @@ macro test_new_functions_fixed()
 }
 
 // test_delete_line_edge_cases - 专门测试删除行的边界情况
-macro test_delete_line_edge_cases()
+function test_delete_line_edge_cases()
 {
     msg "=== 测试删除行边界情况 ==="
     newline = CharFromAscii(10)
@@ -1940,23 +1889,10 @@ macro test_delete_line_edge_cases()
     msg "=== 删除行边界测试结束 ==="
 }
 
-// 主测试函数（修复版）
-macro main_test_fixed()
-{
-    msg "开始测试字符串函数库（修复版）..."
-    msg "========================================"
-    
-    test_new_functions_fixed()
-    msg "========================================"
-    test_delete_line_edge_cases()
-    msg "========================================"
-    test_complex_string()
-    
-    msg "所有测试完成！"
-}
+
 
 // 简单演示函数
-macro demo_line_functions()
+function demo_line_functions()
 {
     msg "=== 演示行操作函数 ==="
     

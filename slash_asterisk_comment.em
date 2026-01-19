@@ -202,9 +202,9 @@ macro slash_asterisk_SingleLineComment()
     } 
     else 
     {
-            szIfStart = GetBufLine(hbuf, LnFirst) //被选择的第一行的上一行的内容
+            szIfStart = GetBufLine(hbuf, LnFirst-1) //被选择的第一行的上一行的内容
     }
-    szIfEnd = GetBufLine(hbuf, lnLast) //被选择的代码块的最后一行的下一行内容
+    szIfEnd = GetBufLine(hbuf, lnLast+1) //被选择的代码块的最后一行的下一行内容
 
 
     szCodeStart = GetBufLine(hbuf, LnFirst) //被选择的代码块的第一行内容
@@ -262,7 +262,7 @@ macro slash_asterisk_SingleLineComment()
     str_end_insert=str_end_insert#"*/"    
     start_string=_slash_asterisk_TrimString(szCodeStart)
     end_sting=_slash_asterisk_TrimString(szCodeEnd)
-    if ( == "/*" &&  =="*/") {
+    if ( start_string == "/*" &&  =="*/") {
             DelBufLine(hbuf, lnLast+1) //从后往前删除行
             DelBufLine(hbuf, lnFirst-1) 
             sel.lnFirst = sel.lnFirst - 1
@@ -280,7 +280,7 @@ macro slash_asterisk_SingleLineComment()
 
 
 //去掉左边空格,Tab等
-macro _slash_asterisk_TrimLeft(szLine)
+function _slash_asterisk_TrimLeft(szLine)
 {
     nLen = strlen(szLine)
     if(nLen == 0)
@@ -301,7 +301,7 @@ macro _slash_asterisk_TrimLeft(szLine)
 
 
 //去掉字符串右边的空格
-macro _slash_asterisk_TrimRight(szLine)
+function _slash_asterisk_TrimRight(szLine)
 {
     nLen = strlen(szLine)
     if(nLen == 0)
@@ -321,7 +321,7 @@ macro _slash_asterisk_TrimRight(szLine)
 }
 
 //去掉字符串两边空格
-macro _slash_asterisk_TrimString(szLine)
+function _slash_asterisk_TrimString(szLine)
 {
     szLine = TrimLeft(szLine)
     szLIne = TrimRight(szLine)
