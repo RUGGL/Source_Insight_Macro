@@ -1238,9 +1238,9 @@ function get_line_content(s, line_num)
 }
 
 
-// insert_str_line - 在指定行插入字符串,自动生成新行
+// str_insert_line - 在指定行插入字符串,自动生成新行
 // 返回: 插入后的新字符串
-function insert_str_line(s, line_num, insert_str)
+function str_insert_line(s, line_num, str_insert)
 {
 
     
@@ -1273,21 +1273,21 @@ function insert_str_line(s, line_num, insert_str)
     if (line_num == 1)
     {
         //为插入字符串末尾添加一个换行符
-        str=cat(insert_str,CharFromAscii(10))
+        str=cat(str_insert,CharFromAscii(10))
         str=cat(str,s)
         return str
     }else if(line_num == total_lines+1){
 //情况2:要插入末尾
 
         //在字符串开头插入换行符
-        str=cat(CharFromAscii(10),insert_str)
+        str=cat(CharFromAscii(10),str_insert)
         str=cat(s,str)
         return str
     }else{
 //情况3:要插入第n行
 
         //为插入字符串开头添加一个换行符
-        str=cat(CharFromAscii(10),insert_str)
+        str=cat(CharFromAscii(10),str_insert)
       
         first_index=0
         second_index=0
@@ -1337,9 +1337,9 @@ function insert_str_line(s, line_num, insert_str)
 
 
 
-// delete_str_line - 删除指定行,行号从1开始
+// str_delete_line - 删除指定行,行号从1开始
 // 返回: 删除后的新字符串
-function delete_str_line(s, line_num)
+function str_delete_line(s, line_num)
 {
     len = strlen(s)
     total_lines = get_line_count(s)
@@ -1448,10 +1448,10 @@ function delete_str_line(s, line_num)
 }
     
 
-// replace_str_line - 替换指定行内容
+// str_replace_line - 替换指定行内容
 // 新字符串可以是多行字符串，中间可以包含换行符
 // 返回: 替换后的新字符串
-function replace_str_line(s, line_num, new_content)
+function str_replace_line(s, line_num, new_content)
 {
     len = strlen(s)
     total_lines = get_line_count(s)
@@ -1479,8 +1479,8 @@ function replace_str_line(s, line_num, new_content)
 
     
     // 先删除原行，再插入新内容
-    temp = delete_str_line(s, line_num)
-    return insert_str_line(temp, line_num, new_content)
+    temp = str_delete_line(s, line_num)
+    return str_insert_line(temp, line_num, new_content)
 }
 
 
@@ -1564,9 +1564,9 @@ function strstr_fromend(main_str, sub_str)
 }
 
 
-// insert_str - 在字符串指定位置插入字符串（正向位置）
+// str_insert - 在字符串指定位置插入字符串（正向位置）
 // 返回: 插入后的新字符串
-function insert_str(s, position, insert_str)
+function str_insert(s, position, str_insert)
 {
    
     len = strlen(s)
@@ -1582,33 +1582,33 @@ function insert_str(s, position, insert_str)
     
     if (position == 0)
     {
-        return cat(insert_str, s)
+        return cat(str_insert, s)
     }
     
     if (position == len)
     {
-        return cat(s, insert_str)
+        return cat(s, str_insert)
     }
     
     before = strmid(s, 0, position)
     after = strmid(s, position, len)
-    str=cat(before, insert_str)
+    str=cat(before, str_insert)
     str=cat(str,after)
     return str
 }
 
 
-// delete_str - 在字符串指定位置删除指定长度字符（正向位置）
+// str_delete - 在字符串指定位置删除指定长度字符（正向位置）
 // 返回: 删除后的新字符串
-function delete_str(s, position, length)
+function str_delete(s, position, length)
 {
+    len = strlen(s)
     //长度为不是正数就报错无法处理
-    if (length <= 0)
+    if (length <= 0 || length>len)
     {
         return ""
     }
-    
-    len = strlen(s)
+
     //位置负数处理,从倒数第position个字符处开始节区length个字符
     if(position<0){
         position=len+position
@@ -1632,17 +1632,17 @@ function delete_str(s, position, length)
 
 
 
-// replace_str - 在字符串指定位置替换字符串（正向位置）
+// str_replace - 在字符串指定位置替换字符串（正向位置）
 // 返回: 替换后的新字符串
-function replace_str(s, position, length, new_str)
+function str_replace(s, position, length, new_str)
 {
+    len = strlen(s)
     //长度为不是正数就报错无法处理
-    if (length <= 0)
+    if (length <= 0 || length>len)
     {
         return ""
     }
-    
-    len = strlen(s)
+
     //位置负数处理,从倒数第position个字符处开始节区length个字符
     if(position<0){
         position=len+position
@@ -1654,26 +1654,28 @@ function replace_str(s, position, length, new_str)
     }
     
     // 先删除，再插入
-    temp = delete_str(s, position, length)
-    return insert_str(temp, position, new_str)
+    temp = str_delete(s, position, length)
+    return str_insert(temp, position, new_str)
 }
 
 
 
-// get_str - 获取指定长度的字符串（正向）
+// str_get - 获取指定长度的字符串（正向）
 // 返回: 从指定位置开始的指定长度子串,position可以为负数(负数表示从末尾开始数),length必须为正数
-function get_str(s, position, length)
+function str_get(s, position, length)
 {
+    len = strlen(s)
     //长度为不是正数就报错无法处理
-    if (length <= 0)
+    if (length <= 0 || length>len)
     {
         return ""
     }
     
-    len = strlen(s)
+
     //位置负数处理,从倒数第position个字符处开始节区length个字符
     if(position<0){
         position=len+position
+        
     }
     //位置越界处理,变为最后length个字符
     if (position + length > len)
@@ -1691,14 +1693,14 @@ function get_str(s, position, length)
 function replace_once_from_begin(s, old_str, new_str)
 {
     pos = strstr(s, old_str)
-    msg "原字符串位置为@pos@"
+    //msg "原字符串位置为@pos@"
     if (pos == -1)
     {
-        msg "未找到，返回原字符串"
+        //msg "未找到，返回原字符串"
         return s  // 未找到，返回原字符串
     }
     
-    return replace_str(s, pos, strlen(old_str), new_str)
+    return str_replace(s, pos, strlen(old_str), new_str)
 }
 
 // replace_once_from_end - 单次替换，用A字符串替换原字符串中的首次匹配到的B字符串（反向）
@@ -1712,7 +1714,7 @@ function replace_once_from_end(s, old_str, new_str)
         return s  // 未找到，返回原字符串
     }
     
-    return replace_str(s, pos, strlen(old_str), new_str)
+    return str_replace(s, pos, strlen(old_str), new_str)
 }
 
 // replace_all - 全部替换，用A字符串替换原字符串中的所有匹配到的B字符串
@@ -1741,13 +1743,14 @@ function replace_all(s, old_str, new_str)
             break
         }
         
-        result = replace_str(result, pos, old_len, new_str)
+        result = str_replace(result, pos, old_len, new_str)
     }
     
     return result
 }
 
 
+//以下为测试部分
 
 /////////////////////////////////////////////////////////////////////////////
 // 工具函数：创建包含换行符的测试字符串
@@ -1933,12 +1936,12 @@ macro test_multiline_string()
     last_line = find_strln_fromend(test_str, "Line")
     msg "最后一个包含'Line'的行: " # last_line # " (期望: 5)"
     
-    // 5. 测试insert_str_line
-    msg "--- 测试insert_str_line ---"
+    // 5. 测试str_insert_line
+    msg "--- 测试str_insert_line ---"
     // 创建要插入的字符串（也使用实际换行符）
     newline = CharFromAscii(10)
-    insert_string = "Inserted line"
-    inserted = insert_str_line(test_str, 3, insert_string)
+    str_inserting = "Inserted line"
+    inserted = str_insert_line(test_str, 3, str_inserting)
     inserted_lines = get_line_count(inserted)
     msg "在第3行插入后的行数: " # inserted_lines # " (期望: 6)"
     
@@ -1948,9 +1951,9 @@ macro test_multiline_string()
         msg "插入后的第3行: \"" # get_line_content(inserted, 3) # "\""
     }
     
-    // 6. 测试delete_str_line（使用简化版本）
-    msg "--- 测试delete_str_line ---"
-    deleted = delete_str_line(test_str, 2)
+    // 6. 测试str_delete_line（使用简化版本）
+    msg "--- 测试str_delete_line ---"
+    deleted = str_delete_line(test_str, 2)
     deleted_lines = get_line_count(deleted)
     msg "删除第2行后的行数: " # deleted_lines # " (期望: 4)"
     
@@ -1975,15 +1978,15 @@ macro test_multiline_string()
     
     // 10. 测试位置操作
     msg "--- 测试位置操作 ---"
-    pos_inserted = insert_str("Hello World", 5, " Beautiful")
+    pos_inserted = str_insert("Hello World", 5, " Beautiful")
     msg "在位置5插入: \"" # pos_inserted # "\" (期望: \"Hello Beautiful World\")"
     
     msg "=== 新增函数测试结束 ==="
-    test_delete_str_line_edge_cases()
+    test_str_delete_line_edge_cases()
 }
 
-// test_delete_str_line_edge_cases - 专门测试删除行的边界情况
-function test_delete_str_line_edge_cases()
+// test_str_delete_line_edge_cases - 专门测试删除行的边界情况
+function test_str_delete_line_edge_cases()
 {
     msg "=== 测试删除行边界情况 ==="
     newline = CharFromAscii(10)
@@ -1991,7 +1994,7 @@ function test_delete_str_line_edge_cases()
     // 测试1: 只有一行的字符串
     msg "--- 测试1: 只有一行 ---"
     single_line = "Only one line"
-    deleted1 = delete_str_line(single_line, 1)
+    deleted1 = str_delete_line(single_line, 1)
     msg "原始: \"" # single_line # "\""
     msg "删除后: \"" # deleted1 # "\" (期望: 空字符串)"
     msg "删除后长度: " # strlen(deleted1)
@@ -2002,14 +2005,14 @@ function test_delete_str_line_edge_cases()
     two_lines = cat(two_lines, newline)
     two_lines = cat(two_lines, "Second line")
     
-    deleted_first = delete_str_line(two_lines, 1)
+    deleted_first = str_delete_line(two_lines, 1)
     msg "原始: \"" # two_lines # "\""
     msg "删除第一行后: \"" # deleted_first # "\""
     msg "删除后行数: " # get_line_count(deleted_first) # " (期望: 1)"
     
     // 测试3: 删除最后一行
     msg "--- 测试3: 删除最后一行 ---"
-    deleted_last = delete_str_line(two_lines, 2)
+    deleted_last = str_delete_line(two_lines, 2)
     msg "删除最后一行后: \"" # deleted_last # "\""
     msg "删除后行数: " # get_line_count(deleted_last) # " (期望: 1)"
     
@@ -2021,7 +2024,7 @@ function test_delete_str_line_edge_cases()
     three_lines = cat(three_lines, newline)
     three_lines = cat(three_lines, "Line 3")
     
-    deleted_middle = delete_str_line(three_lines, 2)
+    deleted_middle = str_delete_line(three_lines, 2)
     msg "原始: \"" # three_lines # "\""
     msg "删除中间行后: \"" # deleted_middle # "\""
     msg "删除后行数: " # get_line_count(deleted_middle) # " (期望: 2)"
@@ -2033,7 +2036,7 @@ function test_delete_str_line_edge_cases()
     with_trailing_nl = cat(with_trailing_nl, "Line 2")
     with_trailing_nl = cat(with_trailing_nl, newline)
     
-    deleted_trailing = delete_str_line(with_trailing_nl, 3)
+    deleted_trailing = str_delete_line(with_trailing_nl, 3)
     msg "原始: \"" # with_trailing_nl # "\""
     msg "删除最后一行后: \"" # deleted_trailing # "\""
     msg "删除后长度: " # strlen(deleted_trailing)
