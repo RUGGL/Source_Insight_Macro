@@ -1,3 +1,22 @@
+//获取当前选中的文本
+macro GetSelText(){
+    hwnd = GetCurrentWnd()
+    if (hwnd == 0)
+        stop
+    sel = GetWndSel(hwnd)
+
+    
+    if(sel.lnFirst != sel.lnLast) 
+    {
+        /*块命令处理*/
+        BlockCommandProc()
+    }
+    if (sel.ichFirst == 0)
+        stop
+    hbuf = GetWndBuf(hwnd)
+
+
+}
 
 
 //将选择的行添加斜杠星注释,每个 /* 注释 在代码段前后独立成一行

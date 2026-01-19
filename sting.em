@@ -216,58 +216,83 @@ function strrchr(s, ch)
     return -1
 }
 
+
 // strstr - 查找子串在字符串中第一次出现的位置
 // 返回: 子串开始位置的索引，未找到返回-1
-function strstr(haystack, needle)
+function strstr(main_str, sub_str)
 {
-    haystack_len = strlen(haystack)
-    needle_len = strlen(needle)
+    main_str_len = strlen(main_str)
+    sub_str_len = strlen(sub_str)
+    ln=1
+    first_matchln=0 //第一次匹配所在的行
+    last_matchln=0 //最后一次匹配所在的行
+    first_matchindex=-1 //第一次匹配所在的位置
+    last_matchindex=-1 //最后一次匹配所在位置
+    match=0 //是否匹配成功
     
-    // 如果needle为空字符串，返回0
-    if (needle_len == 0)
-    {
-        return 0
-    }
-    
-    // 如果needle比haystack长，不可能找到
-    if (needle_len > haystack_len)
+     // 如果sub_str_len为空字符串，返回-1
+    // 如果sub_str_len比main_str_len长，不可能找到
+    if (sub_str_len == 0 || sub_str_len > main_str_len)
     {
         return -1
     }
     
     i = 0
-    max_i = haystack_len - needle_len
+    max_i = main_str_len - sub_str_len
     
     while (i <= max_i)
-    {
-        match = 1  // 假设匹配
+    {       
+        ch1 = main_str[i]
+        ch2 = sub_str[0]
+        ascii1 = AsciiFromChar(ch1)
+        ascii2 = AsciiFromChar(ch2)
         
-        j = 0
-        while (j < needle_len)
-        {
-            // 比较字符的ASCII值
-            ch1 = haystack[i + j]
-            ch2 = needle[j]
-            ascii1 = AsciiFromChar(ch1)
-            ascii2 = AsciiFromChar(ch2)
-            
-            if (ascii1 != ascii2)
+        if(ascii1 == 10){
+            ln=ln+1 //下一行开始,行数增加
+        }
+        
+
+        if (ascii1 == ascii2){//第1个字符匹配成功
+            j = 0
+            while (j < sub_str_len)
             {
-                match = 0  // 不匹配
-                break
+                // 比较字符的ASCII值
+                ch1 = main_str[i + j]
+                ch2 = sub_str[j]
+                ascii1 = AsciiFromChar(ch1)
+                ascii2 = AsciiFromChar(ch2)
+                if (ascii1 != ascii2)
+                {
+                    break
+                }
+                j = j + 1
             }
-            j = j + 1
-        }
-        
-        if (match)
-        {
-            return i
-        }
-        
-        i = i + 1
+            
+            if(j == sub_str_len){ //j遍历完了说明匹配成功
+            
+                match=1
+                if(first_matchln == 0){
+                    first_matchln=ln //记录第1次匹配的行
+                }
+                if(first_matchindex == -1){
+                    first_matchindex=i //记录第1次匹配的行
+                }
+                last_matchln=ln //最后一次匹配的行,每次更新
+                last_matchindex=i //最后一次匹配的索引,每次更新
+
+                break //如果想要遍历完整个字符串,得到最后匹配的行,不要break
+            }
+       }
+       i=i+1
+       
+    }
+    //返回第1个匹配成功的索引
+    if(match == 1){
+        return first_matchindex
+    }else{
+        return -1
     }
     
-    return -1
 }
 
 // strpbrk - 查找字符串中第一个匹配指定字符集中任意字符的位置
@@ -490,7 +515,7 @@ function strcspn(s, reject)
 // strtok - 字符串分割（简化版，单次调用）
 // 注意: 由于Source Insight没有静态变量，这是一个简化实现
 // 返回: 第一个分割出的令牌，或空字符串
-function strtok_simple(s, delim)
+function strtok(s, delim)
 {
     s_len = strlen(s)
     if (s_len == 0)
@@ -720,14 +745,38 @@ function is_printable_char(ch)
     ascii = AsciiFromChar(ch)
     
     // 可打印字符范围：空格(32)到波浪号(126)
+    // 可打印字符范围：如果大于127,也视为可打印字符,有可能有utf8中文
     if (ascii >= 32)
     {
-        if (ascii <= 126)
-        {
-            return 1
-        }
+       return 1
     }
+
     return 0
+}
+
+// is_visible_char - 检查字符是否可见
+// 返回: TRUE(1)或FALSE(0)
+function is_visible_char(ch)
+{
+    if (strlen(ch) == 0)
+    {
+        return 0
+    }
+    ascii = AsciiFromChar(ch)
+    
+    if (ascii < 33) //空格也作为不可见字符
+    {
+        return 0
+    }
+    
+    // delete字符不可见
+    if (ascii == 127)
+    {
+        return 0
+    }
+    
+    return 1
+
 }
 
 
@@ -837,17 +886,9 @@ function unescape_string(s)
     return result
 }
 
-// string.em - C语言字符串函数实现
-// 基于Source Insight宏语言实现
 
 /////////////////////////////////////////////////////////////////////////////
-// 字符串比较函数（保持不变）
-/////////////////////////////////////////////////////////////////////////////
-
-// ...（之前的代码保持不变）...
-
-/////////////////////////////////////////////////////////////////////////////
-// 新增函数：行操作和扩展功能（修复版）
+// 新增函数：行操作和扩展功能
 /////////////////////////////////////////////////////////////////////////////
 
 // get_line_count - 获取字符串中的行数，以\n为行结束标志
@@ -878,9 +919,9 @@ function get_line_count(s)
     return line_count
 }
 
-// find_first_non_printable - 查找第一个非打印字符的索引（正向）
+// find_first_visible_char - 查找第一可见字符的索引（正向）
 // 返回: 索引位置，未找到返回-1
-function find_first_non_printable(s)
+function find_first_visible_char(s)
 {
     len = strlen(s)
     i = 0
@@ -888,7 +929,7 @@ function find_first_non_printable(s)
     while (i < len)
     {
         ch = s[i]
-        if (!is_printable_char(ch))
+        if (is_visible_char(ch))
         {
             return i
         }
@@ -898,9 +939,9 @@ function find_first_non_printable(s)
     return -1
 }
 
-// find_last_non_printable - 查找最后一个非打印字符的索引（反向）
+// find_last_visible_char - 查找最后一个可见字符的索引（反向）
 // 返回: 索引位置，未找到返回-1
-function find_last_non_printable(s)
+function find_last_visible_char(s)
 {
     len = strlen(s)
     i = len - 1
@@ -908,7 +949,7 @@ function find_last_non_printable(s)
     while (i >= 0)
     {
         ch = s[i]
-        if (!is_printable_char(ch))
+        if (is_visible_char(ch))
         {
             return i
         }
@@ -918,480 +959,625 @@ function find_last_non_printable(s)
     return -1
 }
 
-// find_first_line_with_string - 查找包含指定字符串的行号（正向）
-// 返回: 行号（从1开始），未找到返回0
-function find_first_line_with_string(s, search)
+// find_strln_frombegin - 查找包含指定字符串的行号（正向）
+// 返回: 行号（从1开始），未找到返回-1
+function find_strln_frombegin(main_str, sub_str)
 {
-    len = strlen(s)
-    if (len == 0 || strlen(search) == 0)
+    main_str_len = strlen(main_str)
+    sub_str_len = strlen(sub_str)
+    ln=1
+    first_matchln=0 //第一次匹配所在的行
+    last_matchln=0 //最后一次匹配所在的行
+    first_matchindex=-1 //第一次匹配所在的位置
+    last_matchindex=-1 //最后一次匹配所在位置
+    match=0 //是否匹配成功
+    //msg "主字符串长度:@main_str_len@,子字符串长度:@sub_str_len@"
+     // 如果sub_str_len为空字符串，返回-1
+    // 如果sub_str_len比main_str_len长，不可能找到
+    if (sub_str_len == 0 || sub_str_len > main_str_len)
     {
-        return 0
+        //msg "sub_str_len比main_str_len长，不可能找到"
+        return -1
     }
     
-    line_num = 1
-    line_start = 0
     i = 0
-    
-    while (i < len)
-    {
-        ch = s[i]
-        ascii = AsciiFromChar(ch)
+    max_i = main_str_len - sub_str_len
+    while (i <= max_i)
+    {       
+        ch1 = main_str[i]
+        ch2 = sub_str[0]
+        ascii1 = AsciiFromChar(ch1)
+        ascii2 = AsciiFromChar(ch2)
         
-        // 检查当前位置是否能匹配search
-        if (i + strlen(search) <= len)
-        {
-            match = 1
+        if(ascii1 == 10){
+            ln=ln+1 //下一行开始,行数增加
+        }
+
+        if (ascii1 == ascii2){//第1个字符匹配成功
             j = 0
-            while (j < strlen(search))
+            while (j < sub_str_len)
             {
-                if (AsciiFromChar(s[i + j]) != AsciiFromChar(search[j]))
+                // 比较字符的ASCII值
+                ch1 = main_str[i + j]
+                ch2 = sub_str[j]
+                ascii1 = AsciiFromChar(ch1)
+                ascii2 = AsciiFromChar(ch2)
+                if (ascii1 != ascii2)
                 {
-                    match = 0
                     break
                 }
                 j = j + 1
             }
             
-            if (match == 1)
-            {
-                // 找到匹配，确定行号
-                // 从当前位置向前找最近的换行符
-                k = i
-                found_line_start = 0
-                while (k >= line_start)
-                {
-                    if (k == line_start)
-                    {
-                        found_line_start = 1
-                        break
-                    }
-                    
-                    prev_ch = s[k-1]
-                    prev_ascii = AsciiFromChar(prev_ch)
-                    if (prev_ascii == 10)  // 换行符
-                    {
-                        found_line_start = 1
-                        break
-                    }
-                    k = k - 1
+            if(j == sub_str_len){ //j遍历完了说明匹配成功
+            
+                match=1
+                if(first_matchln == 0){
+                    first_matchln=ln //记录第1次匹配的行
                 }
+                if(first_matchindex == -1){
+                    first_matchindex=i //记录第1次匹配的行
+                }
+                last_matchln=ln //最后一次匹配的行,每次更新
+                last_matchindex=i //最后一次匹配的索引,每次更新
                 
-                if (found_line_start == 1)
-                {
-                    return line_num
-                }
+                break //如果想要遍历完整个字符串,得到最后匹配的行,不要break                
             }
-        }
-        
-        if (ascii == 10)  // 换行符
-        {
-            line_num = line_num + 1
-            line_start = i + 1
-        }
-        
-        i = i + 1
+       }
+       i=i+1
+       
+    }
+    //返回第一个匹配成功的行号
+    if(match == 1){
+        return first_matchln
+    }else{
+        return -1
     }
     
-    return 0
 }
 
-// find_last_line_with_string_simple - 查找包含指定字符串的行号（反向，简化版）
+
+// find_strln_fromend - 查找包含指定字符串的行号（反向，简化版）
 // 返回: 行号（从1开始），未找到返回0
-function find_last_line_with_string_simple(s, search)
+function find_strln_fromend(main_str, sub_str)
 {
-    len = strlen(s)
-    search_len = strlen(search)
+    main_str_len = strlen(main_str)
+    sub_str_len = strlen(sub_str)
+    ln=1
+    first_matchln=0 //第一次匹配所在的行
+    last_matchln=0 //最后一次匹配所在的行
+    first_matchindex=-1 //第一次匹配所在的位置
+    last_matchindex=-1 //最后一次匹配所在位置
+    match=0 //是否匹配成功
     
-    if (len == 0 || search_len == 0)
-    {
-        return 0
-    }
-    
-    // 简单的实现：逐行检查
-    total_lines = get_line_count(s)
-    line_num = total_lines
-    
-    while (line_num >= 1)
-    {
-        line_content = get_line_content(s, line_num)
-        
-        // 检查这一行是否包含search
-        if (strstr(line_content, search) != -1)
-        {
-            return line_num
-        }
-        
-        line_num = line_num - 1
-    }
-    
-    return 0
-}
-
-// get_line_content - 获取指定行内容
-// 返回: 整行字符，从上一行换行符(不含)开始到本行换行符(包含)或结束
-function get_line_content(s, line_num)
-{
-    len = strlen(s)
-    if (len == 0 || line_num < 1)
-    {
-        return ""
-    }
-    
-    current_line = 1
-    line_start = 0
-    i = 0
-    
-    while (i < len)
-    {
-        ch = s[i]
-        ascii = AsciiFromChar(ch)
-        
-        if (ascii == 10)  // 换行符
-        {
-            if (current_line == line_num)
-            {
-                // 返回包括换行符的整行
-                return strmid(s, line_start, i + 1)
-            }
-            current_line = current_line + 1
-            line_start = i + 1
-        }
-        
-        i = i + 1
-    }
-    
-    // 处理最后一行（不以换行符结尾）
-    if (current_line == line_num)
-    {
-        return strmid(s, line_start, len)
-    }
-    
-    return ""  // 行号超出范围
-}
-
-// insert_at_line - 在指定行插入字符串
-// 返回: 插入后的新字符串
-function insert_at_line(s, line_num, insert_str)
-{
-    total_lines = get_line_count(s)
-    
-    if (line_num < 1)
-    {
-        return s  // 无效行号，返回原字符串
-    }
-    
-    if (line_num > total_lines + 1)
-    {
-        line_num = total_lines + 1  // 如果行号太大，插入到最后
-    }
-    
-    if (line_num == total_lines + 1)
-    {
-        // 插入到最后一行之后
-        if (strlen(s) == 0)
-        {
-            return insert_str
-        }
-        
-        // 检查最后一行是否有换行符
-        last_ch = s[strlen(s) - 1]
-        if (AsciiFromChar(last_ch) == 10)
-        {
-            return cat(s, insert_str)
-        }
-        else
-        {
-            // 添加换行符再插入
-            newline = CharFromAscii(10)
-            return cat(cat(s, newline), insert_str)
-        }
-    }
-    
-    // 找到目标行的开始位置
-    len = strlen(s)
-    current_line = 1
-    line_start = 0
-    i = 0
-    
-    while (i < len)
-    {
-        ch = s[i]
-        ascii = AsciiFromChar(ch)
-        
-        if (ascii == 10)  // 换行符
-        {
-            if (current_line == line_num)
-            {
-                // 在行首插入
-                before = strmid(s, 0, line_start)
-                after = strmid(s, line_start, len)
-                return cat(cat(before, insert_str), after)
-            }
-            current_line = current_line + 1
-            line_start = i + 1
-        }
-        
-        i = i + 1
-    }
-    
-    // 处理最后一行
-    if (current_line == line_num)
-    {
-        // 在最后一行行首插入
-        before = strmid(s, 0, line_start)
-        after = strmid(s, line_start, len)
-        return cat(cat(before, insert_str), after)
-    }
-    
-    return s
-}
-
-// delete_line - 删除指定行
-// 返回: 删除后的新字符串
-// 无法正常使用,会报错,因此注释
-//macro delete_line(s, line_num)
-//{
-//    total_lines = get_line_count(s)
-    
-//    if (line_num < 1 || line_num > total_lines)
-//    {
-//        return s  // 无效行号，返回原字符串
-//    }
-    
-//    len = strlen(s)
-//    if (len == 0)
-//    {
-//        return s  // 空字符串
-//    }
-    
-//    current_line = 1
-//    line_start = 0
-//    i = 0
-    
-//    while (i < len)
-//    {
-//        ch = s[i]
-//        ascii = AsciiFromChar(ch)
-        
-//        if (ascii == 10)  // 换行符
-//        {
-//            if (current_line == line_num)
-//            {
-//                // 删除这一行（从line_start到i，包括换行符）
-//                // 计算删除的结束位置
-//                delete_end = i
-                
-//                // 如果是最后一行且后面没有换行符？
-//                if (i == len - 1)
-//                {
-//                    // 这是最后一行，且以换行符结尾
-//                    delete_end = i  // 包括换行符
-//                }
-                
-//                // 构建结果
-//                if (line_start == 0)
-//                {
-//                    // 删除第一行
-//                    after = strmid(s, delete_end + 1, len)
-//                    return after
-//                }
-//                else
-//                {
-//                    // 删除中间行
-//                    before = strmid(s, 0, line_start)
-//                    after = strmid(s, delete_end + 1, len)
-//                    return cat(before, after)
-//                }
-//            }
-//            current_line = current_line + 1
-//            line_start = i + 1
-//        }
-        
-//        i = i + 1
-//    }
-    
-//    // 处理最后一行（不以换行符结尾）
-//    if (current_line == line_num)
-//    {
-//        // 删除最后一行
-//        if (line_start == 0)
-//        {
-//            return ""  // 删除唯一一行
-//        }
-//        else
-//        {
-//            // 返回除了最后一行之外的所有内容
-//            // 需要找到前一行的换行符
-//            prev_nl = line_start - 1
-//            found_nl = 0
-//            while (prev_nl >= 0)
-//            {
-//                if (AsciiFromChar(s[prev_nl]) == 10)
-//                {
-//                    found_nl = 1
-//                    break
-//                }
-//                prev_nl = prev_nl - 1
-//            }
-            
-//            if (found_nl == 1)
-//            {
-//                return strmid(s, 0, prev_nl + 1)
-//            }
-//            else
-//            {
-//                return ""  // 只剩一行了
-//            }
-//        }
-//    }
-    
-//    return s
-//}
-
-
-// 为了完整，让我也提供一个更简单的删除行实现
-// delete_line_simple - 删除指定行（简化版本）
-// 返回: 删除后的新字符串
-function delete_line_simple(s, line_num)
-{
-    total_lines = get_line_count(s)
-    
-    if (line_num < 1 || line_num > total_lines)
-    {
-        return s  // 无效行号，返回原字符串
-    }
-    
-    // 方法：构建新字符串，跳过要删除的行
-    len = strlen(s)
-    result = ""
-    current_line = 1
-    line_start = 0
-    i = 0
-    in_target_line = 0
-    
-    while (i < len)
-    {
-        ch = s[i]
-        ascii = AsciiFromChar(ch)
-        
-        if (ascii == 10)  // 换行符
-        {
-            if (current_line == line_num)
-            {
-                // 这是要删除的行，跳过它
-                in_target_line = 0
-            }
-            else
-            {
-                // 这不是要删除的行，添加到结果
-                if (in_target_line == 0)
-                {
-                    // 添加这一行（从line_start到i+1）
-                    line_content = strmid(s, line_start, i + 1)
-                    result = cat(result, line_content)
-                }
-            }
-            
-            current_line = current_line + 1
-            line_start = i + 1
-            in_target_line = 0
-        }
-        
-        i = i + 1
-    }
-    
-    // 处理最后一行（如果不以换行符结尾）
-    if (line_start < len && current_line == line_num)
-    {
-        // 最后一行是要删除的行，什么都不做
-    }
-    else if (line_start < len)
-    {
-        // 最后一行不是要删除的行，添加它
-        last_line = strmid(s, line_start, len)
-        result = cat(result, last_line)
-    }
-    
-    return result
-}
-
-
-// replace_line - 替换指定行内容
-// 新字符串可以是多行字符串，中间可以包含换行符
-// 返回: 替换后的新字符串
-function replace_line(s, line_num, new_content)
-{
-    total_lines = get_line_count(s)
-    
-    if (line_num < 1 || line_num > total_lines)
-    {
-        return s  // 无效行号，返回原字符串
-    }
-    
-    // 先删除原行，再插入新内容
-    temp = delete_line(s, line_num)
-    return insert_at_line(temp, line_num, new_content)
-}
-
-
-// strrchr_reverse - 从后往前查找字符串在字符串中第一次出现的位置
-// 实际上是查找子串最后一次出现的位置
-// 返回: 索引位置，未找到返回-1
-function strrchr_reverse(s, substr)
-{
-    len = strlen(s)
-    sublen = strlen(substr)
-    
-    if (sublen == 0)
-    {
-        return 0
-    }
-    
-    if (sublen > len)
+     // 如果sub_str_len为空字符串，返回-1
+    // 如果sub_str_len比main_str_len长，不可能找到
+    if (sub_str_len == 0 || sub_str_len > main_str_len)
     {
         return -1
     }
     
-    i = len - sublen
-    while (i >= 0)
-    {
-        j = 0
-        if (AsciiFromChar(s[i + 0]) = AsciiFromChar(substr[0])){
+    i = 0
+    max_i = main_str_len - sub_str_len
+    
+    while (i <= max_i)
+    {       
+        ch1 = main_str[i]
+        ch2 = sub_str[0]
+        ascii1 = AsciiFromChar(ch1)
+        ascii2 = AsciiFromChar(ch2)
+        
+        if(ascii1 == 10){
+            ln=ln+1 //下一行开始,行数增加
+        }
+        
 
-            while (j < sublen)
+        if (ascii1 == ascii2){//第1个字符匹配成功
+            j = 0
+            while (j < sub_str_len)
             {
-                if (AsciiFromChar(s[i + j]) != AsciiFromChar(substr[j]))
+                // 比较字符的ASCII值
+                ch1 = main_str[i + j]
+                ch2 = sub_str[j]
+                ascii1 = AsciiFromChar(ch1)
+                ascii2 = AsciiFromChar(ch2)
+                if (ascii1 != ascii2)
                 {
                     break
                 }
                 j = j + 1
             }
-        }
-        if (j == sublen)
-        {
-            return i
-        }
-        
-        i = i - 1
+            
+            if(j == sub_str_len){ //j遍历完了说明匹配成功
+            
+                match=1
+                if(first_matchln == 0){
+                    first_matchln=ln //记录第1次匹配的行
+                }
+                if(first_matchindex == -1){
+                    first_matchindex=i //记录第1次匹配的行
+                }
+
+                last_matchln=ln //最后一次匹配的行,每次更新
+                last_matchindex=i //最后一次匹配的索引,每次更新
+                
+                //break //如果想要遍历完整个字符串,得到最后匹配的行,不要break                
+            }
+       }
+       i=i+1
+       
+    }
+    //返回最后一个匹配成功的行号
+    if(match == 1){
+        return last_matchln
+    }else{
+        return -1
     }
     
-    return -1
 }
 
-// insert_at_position - 在字符串指定位置插入字符串（正向位置）
-// 返回: 插入后的新字符串
-function insert_at_position(s, position, insert_str)
+
+// get_line_content - 获取指定行内容
+// 返回: 整行字符，从上一行换行符(不含)开始到本行换行符(不包含)或结束
+function get_line_content(s, line_num)
 {
+
     len = strlen(s)
-    
-    if (position < 0)
+    total_lines = get_line_count(s)
+    str = ""
+    //msg "行数有@total_lines@行,字符串长度为@len@"
+    if (len == 0 )
     {
-        position = 0
+        return ""
+    }
+    if (line_num <0)//为负数时,默认从末尾倒数第n行
+    {
+        line_num=total_lines+1+line_num
     }
     
+    if (line_num == 0)//为0时,获取第1行
+    {
+        line_num=1
+    }
+    
+    if (line_num > total_lines)//为行数太大时,获取最后1行
+    {
+       line_num = total_lines
+    }    
+
+    //msg "获取第@line_num@行"
+    
+//情况1:字符串只有1行,只可能获取一行
+    if (total_lines == 1)
+    {
+        //直接返回原字符串
+        str=s
+        return str 
+    }
+    
+
+//情况2:字符串有多行,要返回第1行
+    if (line_num == 1)
+    {
+        i = 0
+        while (i < len)
+        {
+            ch = s[i]
+            ascii = AsciiFromChar(ch)
+            if (ascii == 10)  // 找到第1个换行符位置
+            {
+                break;
+            }
+            i=i+1
+        }
+        
+        //直接返回字符串,不含第一行末尾换行符
+        str =strmid(s,0,i)
+        //msg "获取第1行@str@"
+        return str
+    }else{
+
+//情况3:字符串有多行,要返回第n行
+        first_index=0
+        second_index=0
+        num=0 //遍历到的换行符数量
+        i=0
+        while (i < len)
+        {
+            ch = s[i]
+            ascii = AsciiFromChar(ch)
+            
+            if (ascii == 10)  // 换行符
+            {
+                num=num+1
+
+                //找到第n-1个换行符时标记前一半结束位置
+                if(num==line_num-1){
+                    first_index=i
+                    //msg "first_index为@first_index@"
+                }
+                
+                //找到第n个换行符时标记后一半开始位置(当要删除最后一行时,不存在)
+                if(num==line_num){
+                    second_index=i
+                    //msg "second_index为@second_index@"
+                    break
+                }
+            }
+            
+
+            i=i+1
+        }
+
+        
+       
+        if(num == line_num){
+            //能找到第n个换行符,说明获取的中间行
+
+            str=strmid(s,first_index+1,second_index)
+            //msg "获取中间行,字符串为@str@"
+            return str
+        }else{
+            //找不到第n个换行符,说明获取的最后一行
+            //只截取第一段字符
+            if(first_index+1 >len){
+                //最后一行时空行,无内容
+                str=""
+                //msg "最后一行空行,获取最后一行,字符串为@str@"
+                return str 
+            }else{
+                str=strmid(s,first_index+1,len)
+                //msg "最后一行非空,字符串为@str@"
+                return str
+            }
+        }
+        
+
+    }
+
+}
+
+
+// insert_str_line - 在指定行插入字符串,自动生成新行
+// 返回: 插入后的新字符串
+function insert_str_line(s, line_num, insert_str)
+{
+
+    
+    len = strlen(s)
+    total_lines = get_line_count(s)
+    str = ""
+
+    if (len == 0 )
+    {
+        return ""
+    }
+    if (line_num <0)//为负数时,默认从末尾倒数第n行
+    {
+        line_num=total_lines+1+line_num+1
+    }
+    
+    if (line_num == 0)//为负数时,获取第1行
+    {
+        line_num=1
+    }
+    
+    if (line_num > total_lines+1)//插入时,可选行数比总行数大1
+    {
+       line_num = total_lines+1
+    }  
+
+    
+
+//情况1:插入第1行
+    if (line_num == 1)
+    {
+        //为插入字符串末尾添加一个换行符
+        str=cat(insert_str,CharFromAscii(10))
+        str=cat(str,s)
+        return str
+    }else if(line_num == total_lines+1){
+//情况2:要插入末尾
+
+        //在字符串开头插入换行符
+        str=cat(CharFromAscii(10),insert_str)
+        str=cat(s,str)
+        return str
+    }else{
+//情况3:要插入第n行
+
+        //为插入字符串开头添加一个换行符
+        str=cat(CharFromAscii(10),insert_str)
+      
+        first_index=0
+        second_index=0
+        num=0 //遍历到的换行符数量
+        i=0
+        while (i < len)
+        {
+            ch = s[i]
+            ascii = AsciiFromChar(ch)
+            
+            if (ascii == 10)  // 换行符
+            {
+                num=num+1
+
+                //找到第n-1个换行符时标记前一半结束位置
+                if(num==line_num-1){
+                    first_index=i
+                    //msg "first_index为@first_index@"
+                    break
+                }
+                
+                //找到第n个换行符时标记后一半开始位置(当要找最后一行时,不存在)
+                if(num==line_num){
+                    second_index=i
+                    //msg "second_index为@second_index@"
+                    
+                }
+            }                
+
+            i=i+1
+        }
+
+        
+        // 方法：构建新字符串，放入新插入的行
+
+            first_str=strmid(s,0,first_index)
+            second_str=strmid(s,first_index,len)
+            str=cat(first_str,str)
+            str=cat(str,second_str)
+            return str
+
+        
+
+    }
+
+}
+
+
+
+// delete_str_line - 删除指定行,行号从1开始
+// 返回: 删除后的新字符串
+function delete_str_line(s, line_num)
+{
+    len = strlen(s)
+    total_lines = get_line_count(s)
+    str = ""
+
+    if (len == 0 )
+    {
+        return ""
+    }
+    
+    if (line_num <0)//为负数时,默认从末尾倒数第n行
+    {
+        line_num=total_lines+1+line_num
+    }
+    
+    if (line_num == 0)//为0时,删除第1行
+    {
+        line_num=1
+    }
+    
+    if (line_num > total_lines)//为行数太大时,删除最后1行
+    {
+       line_num = total_lines
+    } 
+
+    
+//情况1:字符串只有1行,只可能删除一行
+    if (total_lines == 1)
+    {
+        //直接返回空字符串
+        return "" 
+    }
+    
+
+//情况2:字符串有多行,要删掉第1行
+    if (line_num == 1)
+    {
+        i = 0
+        while (i < len)
+        {
+            ch = s[i]
+            ascii = AsciiFromChar(ch)
+            if (ascii == 10)  // 找到第1个换行符位置
+            {
+                break;
+            }
+            i=i+1
+        }
+        
+        //直接返回字符串,不含第一行末尾换行符
+        str =strmid(s, i+1,len)
+        return str
+    }else{
+
+//情况3:字符串有多行,要删掉第n行
+        first_index=0
+        second_index=0
+        num=0 //遍历到的换行符数量
+        i=0
+        while (i < len)
+        {
+            ch = s[i]
+            ascii = AsciiFromChar(ch)
+            
+            if (ascii == 10)  // 换行符
+            {
+                num=num+1
+
+                //找到第n-1个换行符时标记前一半结束位置
+                if(num==line_num-1){
+                    first_index=i
+                    //msg "first_index为@first_index@"
+                    
+                }
+                
+                //找到第n个换行符时标记后一半开始位置(当要找最后一行时,不存在)
+                if(num==line_num){
+                    second_index=i
+                    //msg "second_index为@second_index@"
+                    break
+                }
+            } 
+
+            i=i+1
+        }
+
+        
+        // 方法：构建新字符串，跳过要删除的行
+        if(num == line_num){
+            //能找到第n个换行符,说明删除的中间行
+            //前后两段字符串连接一起
+            first_str=strmid(s,0,first_index)
+            second_str=strmid(s,second_index,len)
+            str=cat(first_str,second_str)
+            return str
+        }else{
+            //找不到第n个换行符,说明删除的最后一行
+            //只截取第一段字符
+            str=strmid(s,0,first_index)
+            return str
+        }
+        
+
+    }
+
+}
+    
+
+// replace_str_line - 替换指定行内容
+// 新字符串可以是多行字符串，中间可以包含换行符
+// 返回: 替换后的新字符串
+function replace_str_line(s, line_num, new_content)
+{
+    len = strlen(s)
+    total_lines = get_line_count(s)
+    str = ""
+
+    if (len == 0 )
+    {
+        return ""
+    }
+    
+    if (line_num <0)//为负数时,默认从末尾倒数第n行
+    {
+        line_num=total_lines+1+line_num
+    }
+    
+    if (line_num == 0)//为0时,第1行
+    {
+        line_num=1
+    }
+    
+    if (line_num > total_lines)//为行数太大时,最后1行
+    {
+       line_num = total_lines
+    } 
+
+    
+    // 先删除原行，再插入新内容
+    temp = delete_str_line(s, line_num)
+    return insert_str_line(temp, line_num, new_content)
+}
+
+
+// strstr_fromend - 从后往前查找字符串在字符串中第一次出现的位置
+// 实际上是查找子串最后一次出现的位置
+// 返回: 索引位置，未找到返回-1
+function strstr_fromend(main_str, sub_str)
+{
+    main_str_len = strlen(main_str)
+    sub_str_len = strlen(sub_str)
+    ln=1
+    first_matchln=0 //第一次匹配所在的行
+    last_matchln=0 //最后一次匹配所在的行
+    first_matchindex=-1 //第一次匹配所在的位置
+    last_matchindex=-1 //最后一次匹配所在位置
+    match=0 //是否匹配成功
+    
+     // 如果sub_str_len为空字符串，返回-1
+    // 如果sub_str_len比main_str_len长，不可能找到
+    if (sub_str_len == 0 || sub_str_len > main_str_len)
+    {
+        return -1
+    }
+    
+    i = 0
+    max_i = main_str_len - sub_str_len
+    
+    while (i <= max_i)
+    {       
+        ch1 = main_str[i]
+        ch2 = sub_str[0]
+        ascii1 = AsciiFromChar(ch1)
+        ascii2 = AsciiFromChar(ch2)
+        
+        if(ascii1 == 10){
+            ln=ln+1 //下一行开始,行数增加
+        }
+        
+
+        if (ascii1 == ascii2){//第1个字符匹配成功
+            j = 0
+            while (j < sub_str_len)
+            {
+                // 比较字符的ASCII值
+                ch1 = main_str[i + j]
+                ch2 = sub_str[j]
+                ascii1 = AsciiFromChar(ch1)
+                ascii2 = AsciiFromChar(ch2)
+                if (ascii1 != ascii2)
+                {
+                    break
+                }
+                j = j + 1
+            }
+            
+            if(j == sub_str_len){ //j遍历完了说明匹配成功
+            
+                match=1
+                if(first_matchln ==0){
+                    first_matchln=ln //记录第1次匹配的行
+                }
+                if(first_matchindex == -1){
+                    first_matchindex=i //记录第1次匹配的行
+                }
+                last_matchln=ln //最后一次匹配的行,每次更新
+                last_matchindex=i //最后一次匹配的索引,每次更新
+                
+                //break //如果想要遍历完整个字符串,得到最后匹配的行,不要break                
+            }
+       }
+       i=i+1
+       
+    }
+    //返回最后一个匹配成功的索引号
+    if(match == 1){
+        return last_matchindex
+    }else{
+        return -1
+    }
+    
+}
+
+
+// insert_str - 在字符串指定位置插入字符串（正向位置）
+// 返回: 插入后的新字符串
+function insert_str(s, position, insert_str)
+{
+   
+    len = strlen(s)
+    //位置负数处理,从倒数第position个字符处开始节区length个字符
+    if(position<0){
+        position=len+1+position
+    }
+    //位置越界处理,变为最后length个字符
     if (position > len)
     {
-        position = len
+        position=len
     }
     
     if (position == 0)
@@ -1406,191 +1592,127 @@ function insert_at_position(s, position, insert_str)
     
     before = strmid(s, 0, position)
     after = strmid(s, position, len)
-    
-    return cat(cat(before, insert_str), after)
+    str=cat(before, insert_str)
+    str=cat(str,after)
+    return str
 }
 
-// insert_at_position_reverse - 在字符串指定位置插入字符串（反向位置）
-// position从末尾开始计算，0表示末尾
-// 返回: 插入后的新字符串
-function insert_at_position_reverse(s, position, insert_str)
-{
-    len = strlen(s)
-    
-    if (position < 0)
-    {
-        position = 0
-    }
-    
-    if (position > len)
-    {
-        position = len
-    }
-    
-    forward_position = len - position
-    return insert_at_position(s, forward_position, insert_str)
-}
 
-// delete_at_position - 在字符串指定位置删除指定长度字符（正向位置）
+// delete_str - 在字符串指定位置删除指定长度字符（正向位置）
 // 返回: 删除后的新字符串
-function delete_at_position(s, position, length)
+function delete_str(s, position, length)
 {
-    len = strlen(s)
-    
-    if (position < 0)
-    {
-        position = 0
-    }
-    
-    if (position >= len || length <= 0)
-    {
-        return s  // 无效参数
-    }
-    
-    if (position + length > len)
-    {
-        length = len - position  // 调整长度
-    }
-    
-    before = strmid(s, 0, position)
-    after = strmid(s, position + length, len)
-    
-    return cat(before, after)
-}
-
-// delete_at_position_reverse - 在字符串指定位置删除指定长度字符（反向位置）
-// position从末尾开始计算，0表示末尾
-// 返回: 删除后的新字符串
-function delete_at_position_reverse(s, position, length)
-{
-    len = strlen(s)
-    
-    if (position < 0)
-    {
-        position = 0
-    }
-    
-    if (position > len || length <= 0)
-    {
-        return s  // 无效参数
-    }
-    
-    forward_position = len - position - length
-    if (forward_position < 0)
-    {
-        forward_position = 0
-        length = len - position  // 调整长度
-    }
-    
-    return delete_at_position(s, forward_position, length)
-}
-
-// replace_at_position - 在字符串指定位置替换字符串（正向位置）
-// 返回: 替换后的新字符串
-function replace_at_position(s, position, length, new_str)
-{
-    // 先删除，再插入
-    temp = delete_at_position(s, position, length)
-    return insert_at_position(temp, position, new_str)
-}
-
-// replace_at_position_reverse - 在字符串指定位置替换字符串（反向位置）
-// position从末尾开始计算，0表示末尾
-// 返回: 替换后的新字符串
-function replace_at_position_reverse(s, position, length, new_str)
-{
-    len = strlen(s)
-    
-    if (position < 0)
-    {
-        position = 0
-    }
-    
-    if (position > len)
-    {
-        return s  // 无效位置
-    }
-    
-    forward_position = len - position - length
-    if (forward_position < 0)
-    {
-        forward_position = 0
-        length = len - position  // 调整长度
-    }
-    
-    return replace_at_position(s, forward_position, length, new_str)
-}
-
-// get_substring - 获取指定长度的字符串（正向）
-// 返回: 从指定位置开始的指定长度子串
-function get_substring(s, position, length)
-{
-    len = strlen(s)
-    
-    if (position < 0)
-    {
-        position = 0
-    }
-    
-    if (position >= len || length <= 0)
-    {
-        return ""
-    }
-    
-    if (position + length > len)
-    {
-        length = len - position
-    }
-    
-    return strmid(s, position, position + length)
-}
-
-// get_substring_reverse - 获取指定长度的字符串（反向）
-// 从末尾开始获取指定长度的子串
-// 返回: 子串
-function get_substring_reverse(s, length)
-{
-    len = strlen(s)
-    
+    //长度为不是正数就报错无法处理
     if (length <= 0)
     {
         return ""
     }
     
-    if (length > len)
+    len = strlen(s)
+    //位置负数处理,从倒数第position个字符处开始节区length个字符
+    if(position<0){
+        position=len+position
+    }
+    //位置越界处理,变为最后length个字符
+    if (position + length > len)
     {
-        length = len
+        position=len-length
     }
     
-    start = len - length
-    return strmid(s, start, len)
+    before = strmid(s, 0, position)
+    str=before
+    
+    if(position + length < len){
+        after = strmid(s, position + length, len)
+        str=cat(before, after)
+    }
+    
+    return str
 }
 
-// replace_first - 单次替换，用A字符串替换原字符串中的首次匹配到的B字符串（正向）
+
+
+// replace_str - 在字符串指定位置替换字符串（正向位置）
 // 返回: 替换后的新字符串
-function replace_first(s, old_str, new_str)
+function replace_str(s, position, length, new_str)
+{
+    //长度为不是正数就报错无法处理
+    if (length <= 0)
+    {
+        return ""
+    }
+    
+    len = strlen(s)
+    //位置负数处理,从倒数第position个字符处开始节区length个字符
+    if(position<0){
+        position=len+position
+    }
+    //位置越界处理,变为最后length个字符
+    if (position + length > len)
+    {
+        position=len-length
+    }
+    
+    // 先删除，再插入
+    temp = delete_str(s, position, length)
+    return insert_str(temp, position, new_str)
+}
+
+
+
+// get_str - 获取指定长度的字符串（正向）
+// 返回: 从指定位置开始的指定长度子串,position可以为负数(负数表示从末尾开始数),length必须为正数
+function get_str(s, position, length)
+{
+    //长度为不是正数就报错无法处理
+    if (length <= 0)
+    {
+        return ""
+    }
+    
+    len = strlen(s)
+    //位置负数处理,从倒数第position个字符处开始节区length个字符
+    if(position<0){
+        position=len+position
+    }
+    //位置越界处理,变为最后length个字符
+    if (position + length > len)
+    {
+        position=len-length
+    }
+    
+    return strmid(s, position, position + length)
+}
+
+
+
+// replace_once_from_begin - 单次替换，用A字符串替换原字符串中的首次匹配到的B字符串（正向）
+// 返回: 替换后的新字符串
+function replace_once_from_begin(s, old_str, new_str)
 {
     pos = strstr(s, old_str)
+    msg "原字符串位置为@pos@"
     if (pos == -1)
     {
+        msg "未找到，返回原字符串"
         return s  // 未找到，返回原字符串
     }
     
-    return replace_at_position(s, pos, strlen(old_str), new_str)
+    return replace_str(s, pos, strlen(old_str), new_str)
 }
 
-// replace_first_reverse - 单次替换，用A字符串替换原字符串中的首次匹配到的B字符串（反向）
+// replace_once_from_end - 单次替换，用A字符串替换原字符串中的首次匹配到的B字符串（反向）
 // 从末尾开始查找第一次匹配
 // 返回: 替换后的新字符串
-function replace_first_reverse(s, old_str, new_str)
+function replace_once_from_end(s, old_str, new_str)
 {
-    pos = strrchr_reverse(s, old_str)
+    pos = strstr_fromend(s, old_str)
     if (pos == -1)
     {
         return s  // 未找到，返回原字符串
     }
     
-    return replace_at_position(s, pos, strlen(old_str), new_str)
+    return replace_str(s, pos, strlen(old_str), new_str)
 }
 
 // replace_all - 全部替换，用A字符串替换原字符串中的所有匹配到的B字符串
@@ -1619,7 +1741,7 @@ function replace_all(s, old_str, new_str)
             break
         }
         
-        result = replace_at_position(result, pos, old_len, new_str)
+        result = replace_str(result, pos, old_len, new_str)
     }
     
     return result
@@ -1628,44 +1750,38 @@ function replace_all(s, old_str, new_str)
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 测试函数（修复版，使用实际换行符）
-/////////////////////////////////////////////////////////////////////////////
-// 主测试函数（修复版）
-macro main_test_fixed()
-{
-    msg "开始测试字符串函数库（修复版）..."
-    msg "========================================"
-    
-    test_new_functions_fixed()
-    msg "========================================"
-    test_delete_line_edge_cases()
-    msg "========================================"
-    test_complex_string()
-    
-    msg "所有测试完成！"
-}
-/////////////////////////////////////////////////////////////////////////////
 // 工具函数：创建包含换行符的测试字符串
 /////////////////////////////////////////////////////////////////////////////
 
-// create_test_string_with_newlines - 创建包含换行符的测试字符串
+// create_multilines_test_string - 创建包含换行符的测试字符串
 // 使用CharFromAscii(10)创建换行符，避免转义问题
-function create_test_string_with_newlines()
+function create_multilines_test_string()
 {
-    // 使用实际的换行符（ASCII 10）而不是"\n"
+    //使用实际的换行符（ASCII 10）而不是"\n"
     newline = CharFromAscii(10)
     
-    str = "Line 1"
+    str = "/* Line 1"
     str = cat(str, newline)
     str = cat(str, "Line 2")
     str = cat(str, newline)
-    str = cat(str, "Line 3")
+    str = cat(str, "    Line 3")
     str = cat(str, newline)
-    str = cat(str, "Line 4")
+    str = cat(str, "    //Line 4 */")
     str = cat(str, newline)
-    str = cat(str, "Line 5")
-    
+    str = cat(str, "    //Line 5")
+
     return str
+
+//    currentbuf=GetCurrentBuf ()
+//    currentselection=GetBufSelText (currentbuf)
+//    return currentselection
+    //测试文本,测试前请用鼠标选择这几行,选中后将作为测试字符串
+    /* Line 1
+    Line 2
+    Line 3
+    //Line 4 */
+    //Line 5
+
 }
 
 // create_complex_test_string - 创建复杂测试字符串
@@ -1682,18 +1798,39 @@ function create_complex_test_string()
     str = cat(str, newline)
     
     return str
+
+//    currentbuf=GetCurrentBuf ()
+//    currentselection=GetBufSelText (currentbuf)
+//    return currentselection
+    //测试文本,测试前请用鼠标选择这几行,选中后将作为测试行
+    // /* hello \\r\\n  world
+     /* \\r\\n  
+     */
+    
 }
 
 
 // test_complex_string - 测试复杂字符串
-function test_complex_string()
+macro test_complex_string()
 {
+
+    //测试文本,测试前请用鼠标选择这几行,选中后将作为测试行
+    // /* hello \\r\\n  world
+     /* \\r\\n  
+     */
+
     msg "=== 测试复杂字符串 ==="
+
     
+//测试文本,测试前请用鼠标选择这几行,选中后将作为测试行
+//1 /* hello \\r\\n  world
+/*2 \\r\\n  
+  3*/
     complex_str = create_complex_test_string()
+    msg "选择文本为:@complex_str@" 
     msg "复杂字符串长度: " # strlen(complex_str)
-    msg "复杂字符串行数: " # get_line_count(complex_str) # " (期望: 2)"
-    
+    msg "复杂字符串行数: " # get_line_count(complex_str) # " (期望: 3)"
+
     // 显示字符串内容
     msg "字符串内容分析:"
     i = 0
@@ -1733,14 +1870,31 @@ function test_complex_string()
     msg "=== 复杂字符串测试结束 ==="
 }
 
-// test_new_functions_fixed - 测试新增函数（使用实际换行符）
-function test_new_functions_fixed()
+// test_multiline_string - 测试新增函数（使用实际换行符）
+macro test_multiline_string()
 {
+   
+
     msg "=== 测试新增函数（使用实际换行符） ==="
     
+//    currentbuf=GetCurrentBuf()
+//    currentselection=GetBufSelText (currentbuf)//获取当前选中行的文字(只有1行)
+    
+//    hbuf=newbuf("ets")
+//    hwnd=NewWnd (hbuf)
+//    SetBufSelText(hbuf,GetBufSelText (currentbuf))
+    
+//测试文本,测试前请用鼠标选择这几行,选中后将作为测试字符串
+/*1 Line 1
+  2Line 2
+  3Line 3
+//4Line 4 */
+//5Line 5
+
     // 创建测试字符串（使用实际换行符）
-    test_str = create_test_string_with_newlines()
-    msg "测试字符串创建成功，长度: " # strlen(test_str)
+    test_str = create_multilines_test_string()
+    msg "选择文本为:@test_str@" 
+    msg "测试字符串创建成功，长度: " # strlen(currentselection)
     
     // 1. 测试get_line_count
     msg "--- 测试get_line_count ---"
@@ -1769,24 +1923,22 @@ function test_new_functions_fixed()
     msg "第3行内容: \"" # line3 # "\""
     msg "第3行长度: " # line3_len
     
-    // 3. 测试find_first_line_with_string
-    msg "--- 测试find_first_line_with_string ---"
-    first_line = find_first_line_with_string(test_str, "Line 3")
+    // 3. 测试find_strln_frombegin
+    msg "--- 测试find_strln_frombegin ---"
+    first_line = find_strln_frombegin(test_str, "Line 3")
     msg "第一个包含'Line 3'的行: " # first_line # " (期望: 3)"
     
-    // 4. 测试find_last_line_with_string_simple
-    msg "--- 测试find_last_line_with_string_simple ---"
-    last_line = find_last_line_with_string_simple(test_str, "Line")
+    // 4. 测试find_strln_fromend
+    msg "--- 测试find_strln_fromend ---"
+    last_line = find_strln_fromend(test_str, "Line")
     msg "最后一个包含'Line'的行: " # last_line # " (期望: 5)"
     
-    // 5. 测试insert_at_line
-    msg "--- 测试insert_at_line ---"
+    // 5. 测试insert_str_line
+    msg "--- 测试insert_str_line ---"
     // 创建要插入的字符串（也使用实际换行符）
     newline = CharFromAscii(10)
-    insert_str = "Inserted line"
-    insert_str = cat(insert_str, newline)
-    
-    inserted = insert_at_line(test_str, 3, insert_str)
+    insert_string = "Inserted line"
+    inserted = insert_str_line(test_str, 3, insert_string)
     inserted_lines = get_line_count(inserted)
     msg "在第3行插入后的行数: " # inserted_lines # " (期望: 6)"
     
@@ -1796,9 +1948,9 @@ function test_new_functions_fixed()
         msg "插入后的第3行: \"" # get_line_content(inserted, 3) # "\""
     }
     
-    // 6. 测试delete_line_simple（使用简化版本）
-    msg "--- 测试delete_line_simple ---"
-    deleted = delete_line_simple(test_str, 2)
+    // 6. 测试delete_str_line（使用简化版本）
+    msg "--- 测试delete_str_line ---"
+    deleted = delete_str_line(test_str, 2)
     deleted_lines = get_line_count(deleted)
     msg "删除第2行后的行数: " # deleted_lines # " (期望: 4)"
     
@@ -1811,9 +1963,9 @@ function test_new_functions_fixed()
     }
     
 
-    // 8. 测试replace_first
-    msg "--- 测试replace_first ---"
-    replaced = replace_first("abc def abc ghi", "abc", "XYZ")
+    // 8. 测试replace_once_from_begin
+    msg "--- 测试replace_once_from_begin ---"
+    replaced = replace_once_from_begin("abc def abc ghi", "abc", "XYZ")
     msg "替换第一个'abc': \"" # replaced # "\" (期望: \"XYZ def abc ghi\")"
     
     // 9. 测试replace_all
@@ -1823,14 +1975,15 @@ function test_new_functions_fixed()
     
     // 10. 测试位置操作
     msg "--- 测试位置操作 ---"
-    pos_inserted = insert_at_position("Hello World", 5, " Beautiful")
+    pos_inserted = insert_str("Hello World", 5, " Beautiful")
     msg "在位置5插入: \"" # pos_inserted # "\" (期望: \"Hello Beautiful World\")"
     
     msg "=== 新增函数测试结束 ==="
+    test_delete_str_line_edge_cases()
 }
 
-// test_delete_line_edge_cases - 专门测试删除行的边界情况
-function test_delete_line_edge_cases()
+// test_delete_str_line_edge_cases - 专门测试删除行的边界情况
+function test_delete_str_line_edge_cases()
 {
     msg "=== 测试删除行边界情况 ==="
     newline = CharFromAscii(10)
@@ -1838,7 +1991,7 @@ function test_delete_line_edge_cases()
     // 测试1: 只有一行的字符串
     msg "--- 测试1: 只有一行 ---"
     single_line = "Only one line"
-    deleted1 = delete_line_simple(single_line, 1)
+    deleted1 = delete_str_line(single_line, 1)
     msg "原始: \"" # single_line # "\""
     msg "删除后: \"" # deleted1 # "\" (期望: 空字符串)"
     msg "删除后长度: " # strlen(deleted1)
@@ -1849,14 +2002,14 @@ function test_delete_line_edge_cases()
     two_lines = cat(two_lines, newline)
     two_lines = cat(two_lines, "Second line")
     
-    deleted_first = delete_line_simple(two_lines, 1)
+    deleted_first = delete_str_line(two_lines, 1)
     msg "原始: \"" # two_lines # "\""
     msg "删除第一行后: \"" # deleted_first # "\""
     msg "删除后行数: " # get_line_count(deleted_first) # " (期望: 1)"
     
     // 测试3: 删除最后一行
     msg "--- 测试3: 删除最后一行 ---"
-    deleted_last = delete_line_simple(two_lines, 2)
+    deleted_last = delete_str_line(two_lines, 2)
     msg "删除最后一行后: \"" # deleted_last # "\""
     msg "删除后行数: " # get_line_count(deleted_last) # " (期望: 1)"
     
@@ -1868,7 +2021,7 @@ function test_delete_line_edge_cases()
     three_lines = cat(three_lines, newline)
     three_lines = cat(three_lines, "Line 3")
     
-    deleted_middle = delete_line_simple(three_lines, 2)
+    deleted_middle = delete_str_line(three_lines, 2)
     msg "原始: \"" # three_lines # "\""
     msg "删除中间行后: \"" # deleted_middle # "\""
     msg "删除后行数: " # get_line_count(deleted_middle) # " (期望: 2)"
@@ -1880,7 +2033,7 @@ function test_delete_line_edge_cases()
     with_trailing_nl = cat(with_trailing_nl, "Line 2")
     with_trailing_nl = cat(with_trailing_nl, newline)
     
-    deleted_trailing = delete_line_simple(with_trailing_nl, 2)
+    deleted_trailing = delete_str_line(with_trailing_nl, 3)
     msg "原始: \"" # with_trailing_nl # "\""
     msg "删除最后一行后: \"" # deleted_trailing # "\""
     msg "删除后长度: " # strlen(deleted_trailing)
@@ -1889,58 +2042,4 @@ function test_delete_line_edge_cases()
     msg "=== 删除行边界测试结束 ==="
 }
 
-
-
-// 简单演示函数
-function demo_line_functions()
-{
-    msg "=== 演示行操作函数 ==="
-    
-    // 创建多行字符串
-    newline = CharFromAscii(10)
-    multi_line = "第一行"
-    multi_line = cat(multi_line, newline)
-    multi_line = cat(multi_line, "第二行")
-    multi_line = cat(multi_line, newline)
-    multi_line = cat(multi_line, "第三行")
-    
-    msg "原始字符串:"
-    msg "长度: " # strlen(multi_line)
-    msg "行数: " # get_line_count(multi_line) # " (期望: 3)"
-    
-    // 显示各行内容
-    msg "各行内容:"
-    i = 1
-    while (i <= get_line_count(multi_line))
-    {
-        line = get_line_content(multi_line, i)
-        line_len = strlen(line)
-        last_char = line[line_len - 1]
-        last_ascii = AsciiFromChar(last_char)
-        
-        if (last_ascii == 10)
-        {
-            msg "第 " # i # " 行: \"" # strmid(line, 0, line_len - 1) # "\" (以换行符结尾)"
-        }
-        else
-        {
-            msg "第 " # i # " 行: \"" # line # "\" (不以换行符结尾)"
-        }
-        i = i + 1
-    }
-    
-    // 测试查找
-    line_with_second = find_first_line_with_string(multi_line, "第二")
-    msg "包含'第二'的行号: " # line_with_second # " (期望: 2)"
-    
-    // 测试插入
-    inserted = insert_at_line(multi_line, 2, "插入的行" # newline)
-    msg "插入后行数: " # get_line_count(inserted) # " (期望: 4)"
-    
-    // 测试删除
-    deleted = delete_line_simple(multi_line, 2)
-    msg "删除第2行后行数: " # get_line_count(deleted) # " (期望: 2)"
-    
-    msg "=== 演示结束 ==="
-}
 
