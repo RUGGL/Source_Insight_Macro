@@ -23,6 +23,99 @@
 // string.em - C语言字符串函数实现
 // 基于Source Insight宏语言实现
 
+function Char2Ascii(ch){ 
+
+    
+    ascii_num=AsciiFromChar(ch)
+
+    if(ascii_num < 0 ){   
+       //处理中文字符的acsii转换时，source insgiht的Ascii大于127时会溢出成负数，因此处理一下
+       ascii_num=ascii_num+256
+       return ascii_num
+    }else{
+        return ascii_num
+    }
+}
+
+
+function Char2Ascii_CN(ch){ 
+    
+    
+    ascii_num=AsciiFromChar(ch)
+
+
+    if(ascii_num >0){
+        return ascii_num
+    }else if(ascii_num == 0){
+        return 129 //0x81
+    }else{  
+
+        ascii_num=ascii_num+256
+        //处理中文字符的acsii转换时，source insgiht的Ascii大于127时会溢出成负数，因此处理一下
+        if(ascii_num >=0xE2 && ascii_num <= 0xEF){ //0xE2到0xEF为汉字utf-8开头,0xE2为数字226,0xEF为数字239
+            //对于中文utf-8的中间字节的ascii处理,AsciiFromChar(ch)似乎会返回-17和0,特殊处理下
+            //中文utf-8的首字节似乎是显示正常的负数
+                  //对应0x81,数据扩展字符中的未定义字符
+            //msg "中文开头字节编码@ascii_num@，字符:@ch@" 
+            return ascii_num
+        }else if(ascii_num == 0xEF){ //0xEF似乎是中间字节或标点符号开头
+            
+            msg "中文中间字节编码@ascii_num@，字符:@ch@"
+            return 129 //0x81
+        }else{
+
+            return ascii_num
+        }      
+
+    }
+
+}
+
+
+// is_printable_char - 检查字符是否可打印
+// 返回: TRUE(1)或FALSE(0)
+function is_printable_char(ch)
+{
+    if (strlen(ch) == 0)
+    {
+        return 0
+    }
+    
+    ascii = Char2Ascii(ch)
+    
+    // 可打印字符范围：空格(32)到波浪号(126)
+    // 可打印字符范围：如果大于127,也视为可打印字符,有可能有utf8中文
+    if (ascii < 32 || ascii ==127)
+    {
+       return 0
+    }
+
+    return 1
+}
+
+
+// is_visible_char - 判断某个位置是否是可见字符
+// 可见字符包括：ASCII可见字符、中文字符
+// 返回: 1-是可见字符，0-不是（即不可见字符）
+function is_visible_char(ch)
+{
+    if (strlen(ch) == 0)
+    {
+        return 0
+    }
+    
+    ascii = Char2Ascii(ch)
+
+    
+    if (ascii < 33 || ascii ==127)
+    {
+        return 0
+    }
+    
+    return 1
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 // 字符串比较函数
 /////////////////////////////////////////////////////////////////////////////
@@ -52,8 +145,8 @@ function strcmp(s1, s2)
     {
         ch1 = s1[i]  // 注意：这里返回的是字符串，如"o"，而不是字符'o'
         ch2 = s2[i]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if (ascii1 != ascii2)
         {
@@ -95,8 +188,8 @@ function strncmp(s1, s2, n)
     {
         ch1 = s1[i]
         ch2 = s2[i]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if (ascii1 != ascii2)
         {
@@ -155,8 +248,8 @@ function stricmp(s1, s2)
         ch1_lower = tolower(ch1)
         ch2_lower = tolower(ch2)
         
-        ascii1 = AsciiFromChar(ch1_lower)
-        ascii2 = AsciiFromChar(ch2_lower)
+        ascii1 = Char2Ascii(ch1_lower)
+        ascii2 = Char2Ascii(ch2_lower)
         
         if (ascii1 != ascii2)
         {
@@ -182,8 +275,8 @@ function strchr(s, ch)
     {
         // 注意：s[i]返回的是字符串，ch也是字符串，需要转换为ASCII比较
         ch_from_str = s[i]
-        ascii_from_str = AsciiFromChar(ch_from_str)
-        ascii_ch = AsciiFromChar(ch)
+        ascii_from_str = Char2Ascii(ch_from_str)
+        ascii_ch = Char2Ascii(ch)
         
         if (ascii_from_str == ascii_ch)
         {
@@ -200,12 +293,12 @@ function strrchr(s, ch)
 {
     len = strlen(s)
     i = len - 1
-    ascii_ch = AsciiFromChar(ch)
+    ascii_ch = Char2Ascii(ch)
     
     while (i >= 0)
     {
         ch_from_str = s[i]
-        ascii_from_str = AsciiFromChar(ch_from_str)
+        ascii_from_str = Char2Ascii(ch_from_str)
         
         if (ascii_from_str == ascii_ch)
         {
@@ -244,8 +337,8 @@ function strstr(main_str, sub_str)
     {       
         ch1 = main_str[i]
         ch2 = sub_str[0]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if(ascii1 == 10){
             ln=ln+1 //下一行开始,行数增加
@@ -259,8 +352,8 @@ function strstr(main_str, sub_str)
                 // 比较字符的ASCII值
                 ch1 = main_str[i + j]
                 ch2 = sub_str[j]
-                ascii1 = AsciiFromChar(ch1)
-                ascii2 = AsciiFromChar(ch2)
+                ascii1 = Char2Ascii(ch1)
+                ascii2 = Char2Ascii(ch2)
                 if (ascii1 != ascii2)
                 {
                     break
@@ -308,7 +401,7 @@ function strpbrk(s, accept)
     k = 0
     while (k < accept_len)
     {
-        ascii_val = AsciiFromChar(accept[k])
+        ascii_val = Char2Ascii(accept[k])
         ascii_list = cat(ascii_list, CharFromAscii(ascii_val))
         k = k + 1
     }
@@ -317,13 +410,13 @@ function strpbrk(s, accept)
     while (i < s_len)
     {
         ch = s[i]
-        ascii_ch = AsciiFromChar(ch)
+        ascii_ch = Char2Ascii(ch)
         
         // 在ascii_list中查找
         j = 0
         while (j < accept_len)
         {
-            ascii_accept = AsciiFromChar(ascii_list[j])
+            ascii_accept = Char2Ascii(ascii_list[j])
             if (ascii_ch == ascii_accept)
             {
                 return i
@@ -424,7 +517,7 @@ function strspn(s, accept)
     k = 0
     while (k < accept_len)
     {
-        ascii_val = AsciiFromChar(accept[k])
+        ascii_val = Char2Ascii(accept[k])
         accept_ascii = cat(accept_ascii, CharFromAscii(ascii_val))
         k = k + 1
     }
@@ -435,13 +528,13 @@ function strspn(s, accept)
     while (i < s_len)
     {
         ch = s[i]
-        ascii_ch = AsciiFromChar(ch)
+        ascii_ch = Char2Ascii(ch)
         found = 0
         
         j = 0
         while (j < accept_len)
         {
-            ascii_accept = AsciiFromChar(accept_ascii[j])
+            ascii_accept = Char2Ascii(accept_ascii[j])
             if (ascii_ch == ascii_accept)
             {
                 found = 1
@@ -474,7 +567,7 @@ function strcspn(s, reject)
     k = 0
     while (k < reject_len)
     {
-        ascii_val = AsciiFromChar(reject[k])
+        ascii_val = Char2Ascii(reject[k])
         reject_ascii = cat(reject_ascii, CharFromAscii(ascii_val))
         k = k + 1
     }
@@ -485,13 +578,13 @@ function strcspn(s, reject)
     while (i < s_len)
     {
         ch = s[i]
-        ascii_ch = AsciiFromChar(ch)
+        ascii_ch = Char2Ascii(ch)
         found = 0
         
         j = 0
         while (j < reject_len)
         {
-            ascii_reject = AsciiFromChar(reject_ascii[j])
+            ascii_reject = Char2Ascii(reject_ascii[j])
             if (ascii_ch == ascii_reject)
             {
                 found = 1
@@ -575,7 +668,7 @@ function isdigit(ch)
         return 0
     }
     
-    ascii = AsciiFromChar(ch)
+    ascii = Char2Ascii(ch)
     
     if (ascii >= 48)
     {
@@ -607,37 +700,20 @@ function isspace(ch)
         return 0
     }
     
-    ascii = AsciiFromChar(ch)
+    ascii = Char2Ascii(ch)
     
+    // 检查是否是空格
     if (ascii == 32)
     {
-        return 1  // 空格
+        return 1  // 空格是不可见字符
     }
     
-    if (ascii == 9)  // 制表符 \t
+    // 检查是否是ASCII控制字符
+    if (ascii < 32 || ascii == 127)
     {
-        return 1
+        return 1  // 控制字符是不可见字符
     }
-    
-    if (ascii == 10)  // 换行 \n
-    {
-        return 1
-    }
-    
-    if (ascii == 13)  // 回车 \r
-    {
-        return 1
-    }
-    
-    if (ascii == 11)  // 垂直制表符
-    {
-        return 1
-    }
-    
-    if (ascii == 12)  // 换页
-    {
-        return 1
-    }
+
     
     return 0
 }
@@ -708,76 +784,11 @@ function strtrim(s)
     return strmid(s, start, end + 1)
 }
 
-////////////////////////////////////////////////////////////////////////////
-// 特殊字符处理函数（修正版）
-/////////////////////////////////////////////////////////////////////////////
+/***************************************************分界符，以上为C语言string库实现******************************************************/
+function just_line_line_line_line_line_line_line_line1(){}
 
-// contains_special_chars - 检查字符串是否包含控制字符
-// 返回: TRUE(1)或FALSE(0)
-function contains_special_chars(s)
-{
-    len = strlen(s)
-    i = 0
-    while (i < len)
-    {
-        ch = s[i]
-        ascii = AsciiFromChar(ch)
-        
-        // 检查是否是控制字符（ASCII < 32）或删除字符（127）
-        if (ascii < 32 || ascii == 127)
-        {
-            return 1
-        }
-        i = i + 1
-    }
-    return 0
-}
 
-// is_printable_char - 检查字符是否可打印
-// 返回: TRUE(1)或FALSE(0)
-function is_printable_char(ch)
-{
-    if (strlen(ch) == 0)
-    {
-        return 0
-    }
-    
-    ascii = AsciiFromChar(ch)
-    
-    // 可打印字符范围：空格(32)到波浪号(126)
-    // 可打印字符范围：如果大于127,也视为可打印字符,有可能有utf8中文
-    if (ascii >= 32)
-    {
-       return 1
-    }
 
-    return 0
-}
-
-// is_visible_char - 检查字符是否可见
-// 返回: TRUE(1)或FALSE(0)
-function is_visible_char(ch)
-{
-    if (strlen(ch) == 0)
-    {
-        return 0
-    }
-    ascii = AsciiFromChar(ch)
-    
-    if (ascii < 33) //空格也作为不可见字符
-    {
-        return 0
-    }
-    
-    // delete字符不可见
-    if (ascii == 127)
-    {
-        return 0
-    }
-    
-    return 1
-
-}
 
 
 // unescape_string - 将转义序列转换回控制字符（简化版）
@@ -791,13 +802,13 @@ function unescape_string(s)
     while (i < len)
     {
         ch = s[i]
-        ascii = AsciiFromChar(ch)
+        ascii = Char2Ascii(ch)
         
         // 检查是否是反斜杠
         if (ascii == 92 && i + 1 < len)  // 反斜杠
         {
             next_ch = s[i + 1]
-            next_ascii = AsciiFromChar(next_ch)
+            next_ascii = Char2Ascii(next_ch)
             
             if (next_ascii == 116)  // t -> \t
             {
@@ -834,8 +845,8 @@ function unescape_string(s)
                 // 尝试解析十六进制
                 hex1 = s[i + 2]
                 hex2 = s[i + 3]
-                ascii1 = AsciiFromChar(hex1)
-                ascii2 = AsciiFromChar(hex2)
+                ascii1 = Char2Ascii(hex1)
+                ascii2 = Char2Ascii(hex2)
                 
                 value = 0
                 
@@ -907,7 +918,7 @@ function get_line_count(s)
     while (i < len)
     {
         ch = s[i]
-        ascii = AsciiFromChar(ch)
+        ascii = Char2Ascii(ch)
         
         if (ascii == 10)  // 换行符
         {
@@ -919,11 +930,13 @@ function get_line_count(s)
     return line_count
 }
 
-// find_first_visible_char - 查找第一可见字符的索引（正向）
+// find_visible_char_atbegin - 查找第一可见字符的索引（正向）
 // 返回: 索引位置，未找到返回-1
-function find_first_visible_char(s)
+function find_visible_char_atbegin(s)
 {
     len = strlen(s)
+    first_index=-1
+    last_index=-1
     i = 0
     
     while (i < len)
@@ -931,32 +944,42 @@ function find_first_visible_char(s)
         ch = s[i]
         if (is_visible_char(ch))
         {
-            return i
+            if(first_index==-1){
+                first_index=i
+            }
+            last_index=i
+            break
         }
         i = i + 1
     }
     
-    return -1
+    return first_index
 }
 
-// find_last_visible_char - 查找最后一个可见字符的索引（反向）
+// find_unvisible_char_atend(s) - 查找最后一个可见字符的后一个位置的索引
 // 返回: 索引位置，未找到返回-1
-function find_last_visible_char(s)
+function find_unvisible_char_atend(s)
 {
     len = strlen(s)
-    i = len - 1
+    first_index=-1
+    last_index=-1
+    i = 0
     
-    while (i >= 0)
+    while (i < len)
     {
         ch = s[i]
         if (is_visible_char(ch))
         {
-            return i
+            if(first_index==-1){
+                first_index=i
+            }
+            last_index=i+1 //最后一个可见字符位置+1
         }
-        i = i - 1
+        i = i + 1
     }
     
-    return -1
+    return last_index
+
 }
 
 // find_strln_frombegin - 查找包含指定字符串的行号（正向）
@@ -986,8 +1009,8 @@ function find_strln_frombegin(main_str, sub_str)
     {       
         ch1 = main_str[i]
         ch2 = sub_str[0]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if(ascii1 == 10){
             ln=ln+1 //下一行开始,行数增加
@@ -1000,8 +1023,8 @@ function find_strln_frombegin(main_str, sub_str)
                 // 比较字符的ASCII值
                 ch1 = main_str[i + j]
                 ch2 = sub_str[j]
-                ascii1 = AsciiFromChar(ch1)
-                ascii2 = AsciiFromChar(ch2)
+                ascii1 = Char2Ascii(ch1)
+                ascii2 = Char2Ascii(ch2)
                 if (ascii1 != ascii2)
                 {
                     break
@@ -1064,8 +1087,8 @@ function find_strln_fromend(main_str, sub_str)
     {       
         ch1 = main_str[i]
         ch2 = sub_str[0]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if(ascii1 == 10){
             ln=ln+1 //下一行开始,行数增加
@@ -1079,8 +1102,8 @@ function find_strln_fromend(main_str, sub_str)
                 // 比较字符的ASCII值
                 ch1 = main_str[i + j]
                 ch2 = sub_str[j]
-                ascii1 = AsciiFromChar(ch1)
-                ascii2 = AsciiFromChar(ch2)
+                ascii1 = Char2Ascii(ch1)
+                ascii2 = Char2Ascii(ch2)
                 if (ascii1 != ascii2)
                 {
                     break
@@ -1163,7 +1186,7 @@ function get_line_content(s, line_num)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             if (ascii == 10)  // 找到第1个换行符位置
             {
                 break;
@@ -1185,7 +1208,7 @@ function get_line_content(s, line_num)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             
             if (ascii == 10)  // 换行符
             {
@@ -1296,7 +1319,7 @@ function str_insert_line(s, line_num, str_insert)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             
             if (ascii == 10)  // 换行符
             {
@@ -1381,7 +1404,7 @@ function str_delete_line(s, line_num)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             if (ascii == 10)  // 找到第1个换行符位置
             {
                 break;
@@ -1402,7 +1425,7 @@ function str_delete_line(s, line_num)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             
             if (ascii == 10)  // 换行符
             {
@@ -1512,8 +1535,8 @@ function strstr_fromend(main_str, sub_str)
     {       
         ch1 = main_str[i]
         ch2 = sub_str[0]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if(ascii1 == 10){
             ln=ln+1 //下一行开始,行数增加
@@ -1527,8 +1550,8 @@ function strstr_fromend(main_str, sub_str)
                 // 比较字符的ASCII值
                 ch1 = main_str[i + j]
                 ch2 = sub_str[j]
-                ascii1 = AsciiFromChar(ch1)
-                ascii2 = AsciiFromChar(ch2)
+                ascii1 = Char2Ascii(ch1)
+                ascii2 = Char2Ascii(ch2)
                 if (ascii1 != ascii2)
                 {
                     break
@@ -1749,99 +1772,921 @@ function replace_all(s, old_str, new_str)
     return result
 }
 
-
-//以下为测试部分
+/***************************************分界符，以上为字符位置查找函数实现*****  *********************************/
+function just_line_line_line_line_line_line_line_line2(){}
 
 /////////////////////////////////////////////////////////////////////////////
-// 工具函数：创建包含换行符的测试字符串
+// 基础编码判断函数（返回字节数量）
 /////////////////////////////////////////////////////////////////////////////
 
-// create_multilines_test_string - 创建包含换行符的测试字符串
-// 使用CharFromAscii(10)创建换行符，避免转义问题
-function create_multilines_test_string()
+// is_CN_utf8 - 判断从指定位置开始是否是UTF-8编码的中文字符
+// 返回: 0-不是UTF-8中文，3或4-是UTF-8中文（返回字节数量）
+
+
+function is_CN_utf8(s, position)
 {
-    //使用实际的换行符（ASCII 10）而不是"\n"
-    newline = CharFromAscii(10)
-    
-    str = "/* Line 1"
-    str = cat(str, newline)
-    str = cat(str, "Line 2")
-    str = cat(str, newline)
-    str = cat(str, "    Line 3")
-    str = cat(str, newline)
-    str = cat(str, "    //Line 4 */")
-    str = cat(str, newline)
-    str = cat(str, "    //Line 5")
-
-    return str
-
-//    currentbuf=GetCurrentBuf ()
-//    currentselection=GetBufSelText (currentbuf)
-//    return currentselection
-    //测试文本,测试前请用鼠标选择这几行,选中后将作为测试字符串
-    /* Line 1
-    Line 2
-    Line 3
-    //Line 4 */
-    //Line 5
-
-}
-
-// create_complex_test_string - 创建复杂测试字符串
-function create_complex_test_string()
-{
-    newline = CharFromAscii(10)
-    carriage_return = CharFromAscii(13)
-    tab = CharFromAscii(9)
-    
-    str = "    // /* hello \\r\\n  world "
-    str = cat(str, carriage_return)
-    str = cat(str, newline)
-    str = cat(str, " */ \\r\\n  ")
-    str = cat(str, newline)
-    
-    return str
-
-//    currentbuf=GetCurrentBuf ()
-//    currentselection=GetBufSelText (currentbuf)
-//    return currentselection
-    //测试文本,测试前请用鼠标选择这几行,选中后将作为测试行
-    // /* hello \\r\\n  world
-     /* \\r\\n  
-     */
-    
-}
-
-
-// test_complex_string - 测试复杂字符串
-macro test_complex_string()
-{
-
-    //测试文本,测试前请用鼠标选择这几行,选中后将作为测试行
-    // /* hello \\r\\n  world
-     /* \\r\\n  
-     */
-
-    msg "=== 测试复杂字符串 ==="
-
-    
-//测试文本,测试前请用鼠标选择这几行,选中后将作为测试行
-//1 /* hello \\r\\n  world
-/*2 \\r\\n  
-  3*/
-    complex_str = create_complex_test_string()
-    msg "选择文本为:@complex_str@" 
-    msg "复杂字符串长度: " # strlen(complex_str)
-    msg "复杂字符串行数: " # get_line_count(complex_str) # " (期望: 3)"
-
-    // 显示字符串内容
-    msg "字符串内容分析:"
-    i = 0
-    while (i < strlen(complex_str))
+    len = strlen(s)
+    if (position < 0 || position >= len)
     {
-        ch = complex_str[i]
-        ascii = AsciiFromChar(ch)
+        return 0
+    }
+    
+    // 获取第一个字节
+    ch1 = s[position]
+    byte1 = Char2Ascii_CN(ch1)
+
+    //msg "第1个字节@ch1@编码为:@byte1@"
+
+    // 检查是否是3字节UTF-8中文字符 (0xE4-0xE9是常用中文范围)
+//    if (byte1 >= 0xE4 && byte1 <= 0xE9)
+//    {
+//        // 确保有足够的后续字节
+//        //msg "有足够的后续字节"
+//        if (position + 2 < len)
+//        {
+//            // 检查第二、三个字节是否在有效范围 (0x80-0xBF)
+
+//            byte2 = Char2Ascii_CN(ch2)
+//            //msg "第2个字节@ch2@编码为:@byte2@"
+
+//            ch3 = s[position + 2]
+//            byte3 = Char2Ascii_CN(ch3)
+//            //msg "第3个字节@ch3@编码为:@byte3@"
+
+//            if (byte2 >= 0x80 && byte2 <= 0xBF)
+//            {
+
+//                if(byte3 >= 0x80 && byte3 <= 0xBF) {
+                
+//                    return 3  // 是3字节UTF-8中文
+//                }
+
+//            }
+//        }
+//    }
+    
+    // 检查其他可能的UTF-8中文范围 (3字节)
+    if (byte1 >= 0xE0 && byte1 <= 0xEF)
+    {
+        if (position + 2 < len) //长度够就按三字节返回
+        {
+//            ch2 = s[position + 1]
+//            byte2 = Char2Ascii_CN(ch2)
+//            ch3 = s[position + 2]
+//            byte3 = Char2Ascii_CN(ch3)
+            
+//            if (byte2 >= 0x80 && byte2 <= 0xBF && byte3 >= 0x80 && byte3 <= 0xBF)
+//            {
+//                // 进一步检查是否是中文常用Unicode范围
+//                // Unicode中文范围: 0x4E00-0x9FFF
+//                // 对应的UTF-8: 
+//                // 0x4E00-0x4FFF: 0xE4 0xB8 0x80 - 0xE4 0xBF 0xBF
+//                // 0x5000-0x9FFF: 0xE5 0x80 0x80 - 0xE9 0xBF 0xBF
+//                if ((byte1 == 0xE4 && byte2 >= 0xB8) || 
+//                    (byte1 >= 0xE5 && byte1 <= 0xE9))
+//                {
+//                    return 3
+//                }
+                
+//                // 其他3字节UTF-8字符也可能是中文
+//                if (byte1 == 0xE3 || byte1 == 0xE2 || byte1 == 0xE1 || byte1 == 0xE0)
+//                {
+//                    // 这些可能是其他CJK字符
+                    return 3
+//                }
+//            }
+        }
+    }
+    
+    // 检查4字节UTF-8字符 (扩展中文范围)，注释掉，不考虑
+//    if (byte1 >= 0xF0 && byte1 <= 0xF4)
+//    {
+//        if (position + 3 < len)
+//        {
+//            valid = 1
+//            i = 1
+//            while (i <= 3)
+//            {
+//                ch = s[position + i]
+//                byte = Char2Ascii_CN(ch)
+//                if (byte < 0x80 || byte > 0xBF)
+//                {
+//                    valid = 0
+//                    break
+//                }
+//                i = i + 1
+//            }
+            
+//            if (valid == 1)
+//            {
+//                // 检查是否是CJK扩展A区或B区
+//                // CJK扩展A区: 0x3400-0x4DBF -> UTF-8: 0xF0 0xA4 0x80 0x80 - 0xF0 0xA4 0xB6 0xBF
+//                // CJK扩展B区: 0x20000-0x2A6DF -> UTF-8: 0xF0 0xA0 0x80 0x80 - 0xF0 0xAA 0x9B 0x9F
+//                if (byte1 == 0xF0)
+//                {
+//                    ch2 = s[position + 1]
+//                    byte2 = Char2Ascii_CN(ch2)
+//                    if ((byte2 >= 0xA4 && byte2 <= 0xA4) ||  // 扩展A区
+//                        (byte2 >= 0xA0 && byte2 <= 0xAA))    // 扩展B区等
+//                    {
+//                        return 4
+//                    }
+//                }
+//                return 4  // 其他4字节UTF-8
+//            }
+//        }
+//    }
+    
+    return 0
+}
+
+
+
+// is_CN_char - 判断从指定位置开始是否是中文字符（自动检测编码）
+// 先尝试UTF-8，再尝试GBK
+// 返回: 0-不是中文字符，>0-是中文字符（返回字节数量）
+function is_CN_char(s, position)
+{
+    // 先检查UTF-8
+    utf8_result = is_CN_utf8(s, position)
+    if (utf8_result > 0)
+    {
+        //msg "@s@是中文utf8，字节数为@utf8_result@"
+        return utf8_result
+    }
+ 
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// UTF-8相关辅助函数
+/////////////////////////////////////////////////////////////////////////////
+
+// get_utf8_char_length - 获取UTF-8字符的字节长度
+// 返回: UTF-8字符的字节数 (1-4)，如果不是有效的UTF-8返回0
+function get_utf8_char_length(s, position)
+{
+    len = strlen(s)
+    
+    if (position < 0 || position >= len)
+    {
+        return 0
+    }
+    
+    // 获取第一个字节
+    ch1 = s[position]
+    byte1 = Char2Ascii(ch1)
+    
+    // ASCII字符 (0-127)
+    if (byte1 < 0x80)
+    {
+        return 1
+    }
+    
+    // 2字节UTF-8 (110xxxxx)
+    if (byte1 >= 0xC0 && byte1 <= 0xDF)
+    {
+        if (position + 1 >= len)
+        {
+            return 0
+        }
         
+        ch2 = s[position + 1]
+        byte2 = Char2Ascii(ch2)
+        if (byte2 >= 0x80 && byte2 <= 0xBF)
+        {
+            return 2
+        }
+    }
+    
+    // 3字节UTF-8 (1110xxxx) - 包含大部分中文
+    if (byte1 >= 0xE0 && byte1 <= 0xEF)
+    {
+        if (position + 2 >= len)
+        {
+            return 0
+        }
+        
+        ch2 = s[position + 1]
+        byte2 = Char2Ascii(ch2)
+        ch3 = s[position + 2]
+        byte3 = Char2Ascii(ch3)
+        
+        if (byte2 >= 0x80 && byte2 <= 0xBF && byte3 >= 0x80 && byte3 <= 0xBF)
+        {
+            return 3
+        }
+    }
+    
+    // 4字节UTF-8 (11110xxx)
+    if (byte1 >= 0xF0 && byte1 <= 0xF7)
+    {
+        if (position + 3 >= len)
+        {
+            return 0
+        }
+        
+        valid = 1
+        i = 1
+        while (i <= 3)
+        {
+            ch = s[position + i]
+            byte = Char2Ascii(ch)
+            if (byte < 0x80 || byte > 0xBF)
+            {
+                valid = 0
+                break
+            }
+            i = i + 1
+        }
+        
+        if (valid == 1)
+        {
+            return 4
+        }
+    }
+    
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 修改其他函数使用新的判断函数
+/////////////////////////////////////////////////////////////////////////////
+
+// count_CN_utf8_chars - 统计字符串中的UTF-8中文字符数量
+// 返回: 中文字符数量
+function count_CN_utf8_chars(s)
+{
+    len = strlen(s)
+    count = 0
+    i = 0
+    
+    while (i < len)
+    {
+        cn_len = is_CN_utf8(s, i)
+        if (cn_len > 0)
+        {
+            count = count + 1
+            i = i + cn_len
+        }
+        else
+        {
+            // 不是中文字符，检查下一个字符
+            utf8_len = get_utf8_char_length(s, i)
+            if (utf8_len > 0)
+            {
+                i = i + utf8_len
+            }
+            else
+            {
+                i = i + 1  // 无效字节，跳过1个
+            }
+        }
+    }
+    
+    return count
+}
+
+
+// count_CN_chars - 统计字符串中的中文字符数量（自动检测编码）
+// 返回: 中文字符数量
+count_CN_chars(" 世界 ")
+
+function count_CN_chars(s)
+{
+    len = strlen(s)
+    count = 0
+    i = 0
+    msg "当前字符串为@s@,长度为@len@"
+
+    while (i < len)
+    {
+        ch = s[i]
+        byte1 = Char2Ascii_CN(ch)
+        cn_len = is_CN_char(s, i)
+
+        if (cn_len > 0)
+        {
+            msg "位置@i@开始的字符串是中文,长度@cn_len@,第一个ascii编码为@byte1@,字符为@ch@"
+            count = count + 1
+            i = i + cn_len
+        }
+        else
+        {
+                // 扩展ASCII，按单字节处理
+            i = i + 1
+        }
+    }
+    
+    return count
+}
+
+// find_first_CN_utf8 - 查找第一个UTF-8中文字符的位置
+// 返回: 位置索引，未找到返回-1
+function find_first_CN_utf8(s)
+{
+    len = strlen(s)
+    i = 0
+    
+    while (i < len)
+    {
+        cn_len = is_CN_utf8(s, i)
+        if (cn_len > 0)
+        {
+            return i
+        }
+        
+        // 移动到下一个字符开始位置
+        utf8_len = get_utf8_char_length(s, i)
+        if (utf8_len > 0)
+        {
+            i = i + utf8_len
+        }
+        else
+        {
+            i = i + 1
+        }
+    }
+    
+    return -1
+}
+
+
+// find_first_CN_char - 查找第一个中文字符的位置（自动检测编码）
+// 返回: 位置索引，未找到返回-1
+function find_first_CN_char(s)
+{
+    // 先尝试查找UTF-8中文
+    pos = find_first_CN_utf8(s)
+    if (pos != -1)
+    {
+        return pos
+    }
+    
+}
+
+// get_CN_char - 获取从指定位置开始的中文字符
+// 返回: 中文字符字符串，如果不是中文字符返回空字符串
+function get_CN_char(s, position)
+{
+    len = strlen(s)
+    
+    if (position < 0 || position >= len)
+    {
+        return ""
+    }
+    
+    // 获取字符长度
+    cn_len = is_CN_char(s, position)
+    
+    if (cn_len > 0 && position + cn_len <= len)
+    {
+        return strmid(s, position, position + cn_len)
+    }
+    
+    return ""
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// ASCII判断函数（保持不变，但更新调用方式）
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 测试函数
+/////////////////////////////////////////////////////////////////////////////
+
+// test_CN_functions - 测试中文判断函数
+function test_CN_functions()
+{
+    msg "=== 测试中文判断函数 ==="
+    
+    // 测试字符串（UTF-8编码）
+    test_str = "Hello 世界！这是一个测试。Test 测试"
+    msg "测试字符串: \"" # test_str # "\""
+    msg "字符串长度(字节): " # strlen(test_str)
+    
+    // 显示字符串的字节信息
+    msg "--- 字节分析 ---"
+    i = 0
+    while (i < strlen(test_str) && i < 30)
+    {
+        ch = test_str[i]
+        ascii = Char2Ascii(ch)
+        
+        // 检查是否是中文
+        cn_len = is_CN_char(test_str, i)
+        if (cn_len > 0)
+        {
+            cn_char = strmid(test_str, i, i + cn_len)
+            msg "位置 " # i # ": 中文字符 '" # cn_char # "' (长度: " # cn_len # ", ASCII: " # ascii # ")"
+            i = i + cn_len - 1
+        }
+        else if (ascii >= 32 && ascii <= 126)
+        {
+            msg "位置 " # i # ": ASCII字符 '" # ch # "' (ASCII: " # ascii # ")"
+        }
+        else if (ascii < 32 || ascii == 127)
+        {
+            if (ascii == 32)
+            {
+                msg "位置 " # i # ": 空格"
+            }
+            else if (ascii == 9)
+            {
+                msg "位置 " # i # ": 制表符"
+            }
+            else if (ascii == 10)
+            {
+                msg "位置 " # i # ": 换行符"
+            }
+            else
+            {
+                msg "位置 " # i # ": 控制字符 (ASCII: " # ascii # ")"
+            }
+        }
+        else
+        {
+            msg "位置 " # i # ": 扩展字符 (ASCII: " # ascii # ")"
+        }
+        
+        i = i + 1
+    }
+    
+    // 测试统计函数
+    msg "--- 统计测试 ---"
+    utf8_count = count_CN_utf8_chars(test_str)
+
+    total_count = count_CN_chars(test_str)
+    
+    msg "UTF-8中文字符数: " # utf8_count
+
+    msg "总中文字符数: " # total_count
+    
+    // 测试查找函数
+    msg "--- 查找测试 ---"
+    first_utf8 = find_first_CN_utf8(test_str)
+
+    first_cn = find_first_CN_char(test_str)
+    
+    msg "第一个UTF-8中文位置: " # first_utf8
+
+    msg "第一个中文位置: " # first_cn
+    
+    if (first_cn != -1)
+    {
+        cn_char = get_CN_char(test_str, first_cn)
+        msg "第一个中文字符: '" # cn_char # "'"
+        
+        // 检查该字符的长度
+        cn_len = is_CN_char(test_str, first_cn)
+        msg "字符长度: " # cn_len
+    }
+    
+    // 测试具体位置判断
+    msg "--- 具体位置判断 ---"
+    
+    // 测试位置6（应该是"世"字）
+    pos = 6
+    cn_len1 = is_CN_utf8(test_str, pos)
+
+    cn_len3 = is_CN_char(test_str, pos)
+    
+    msg "位置 " # pos # " 判断结果:"
+    msg "  is_CN_utf8: " # cn_len1 # " (期望: 3)"
+
+    msg "  is_CN_char: " # cn_len3 # " (期望: 3)"
+    
+    if (cn_len1 > 0)
+    {
+        cn_char = strmid(test_str, pos, pos + cn_len1)
+        msg "  字符: '" # cn_char # "'"
+    }
+    
+    // 测试纯中文字符串
+    msg "--- 纯中文测试 ---"
+    chinese_only = "中华人民共和国"
+    msg "纯中文字符串: \"" # chinese_only # "\""
+    msg "字节数: " # strlen(chinese_only)
+    msg "中文字符数: " # count_CN_chars(chinese_only)
+    
+    // 测试混合字符串中的中文判断
+    msg "--- 混合字符串遍历 ---"
+    mixed = "A测试B中文C"
+    msg "混合字符串: \"" # mixed # "\""
+    
+    i = 0
+    while (i < strlen(mixed))
+    {
+        cn_len = is_CN_char(mixed, i)
+        if (cn_len > 0)
+        {
+            cn_char = strmid(mixed, i, i + cn_len)
+            msg "位置 " # i # ": 中文字符 '" # cn_char # "' (长度: " # cn_len # ")"
+            i = i + cn_len
+        }
+        else
+        {
+            ch = mixed[i]
+            ascii = Char2Ascii(ch)
+            if (ascii >= 32 && ascii <= 126)
+            {
+                msg "位置 " # i # ": ASCII字符 '" # ch # "'"
+            }
+            i = i + 1
+        }
+    }
+    
+    msg "=== 中文判断测试结束 ==="
+}
+
+// test_encoding_detection - 测试编码检测
+function test_encoding_detection()
+{
+    msg "=== 测试编码检测 ==="
+    
+    // 测试不同情况
+    test1 = "Hello World"
+    test2 = "你好世界"
+    test3 = "Hello 世界！"
+    test4 = "Test测试Mixed混合"
+    
+    msg "测试用例1 - 纯ASCII:"
+    msg "字符串: \"" # test1 # "\""
+    msg "中文字符数: " # count_CN_chars(test1) # " (期望: 0)"
+    
+    msg "测试用例2 - 纯中文:"
+    msg "字符串: \"" # test2 # "\""
+    msg "字节数: " # strlen(test2)
+    msg "中文字符数: " # count_CN_chars(test2)
+    msg "UTF-8中文数: " # count_CN_utf8_chars(test2)
+    
+    msg "测试用例3 - 中英混合:"
+    msg "字符串: \"" # test3 # "\""
+    msg "中文字符数: " # count_CN_chars(test3)
+    first_cn = find_first_CN_char(test3)
+    msg "第一个中文位置: " # first_cn
+    if (first_cn != -1)
+    {
+        cn_char = get_CN_char(test3, first_cn)
+        msg "第一个中文字符: '" # cn_char # "'"
+    }
+    
+    msg "测试用例4 - 复杂混合:"
+    msg "字符串: \"" # test4 # "\""
+    msg "中文字符数: " # count_CN_chars(test4)
+    
+    // 遍历显示所有字符
+    msg "字符分析:"
+    i = 0
+    while (i < strlen(test4))
+    {
+        cn_len = is_CN_char(test4, i)
+        if (cn_len > 0)
+        {
+            cn_char = strmid(test4, i, i + cn_len)
+            msg "位置 " # i # ": 中文 '" # cn_char # "' (长度: " # cn_len # ")"
+            i = i + cn_len
+        }
+        else
+        {
+            ch = test4[i]
+            ascii = Char2Ascii(ch)
+            if (ascii >= 32 && ascii <= 126)
+            {
+                msg "位置 " # i # ": ASCII '" # ch # "'"
+            }
+            else
+            {
+                msg "位置 " # i # ": 其他 (ASCII: " # ascii # ")"
+            }
+            i = i + 1
+        }
+    }
+    
+    msg "=== 编码检测测试结束 ==="
+}
+
+// quick_test_CN - 快速测试中文判断
+function quick_test_CN()
+{
+    msg "快速测试中文判断:"
+    
+    test_str = "Hello 世界！测试123"
+    
+    msg "测试字符串: \"" # test_str # "\""
+    msg "总字节数: " # strlen(test_str)
+    msg "中文字符数: " # count_CN_chars(test_str)
+    
+    // 查找第一个中文
+    first_cn = find_first_CN_char(test_str)
+    msg "第一个中文位置: " # first_cn
+    
+    if (first_cn != -1)
+    {
+        cn_char = get_CN_char(test_str, first_cn)
+        cn_len = is_CN_char(test_str, first_cn)
+        msg "第一个中文: '" # cn_char # "' (长度: " # cn_len # ")"
+    }
+    
+    // 测试各个位置
+    msg "位置判断测试:"
+    pos = 6
+    cn_len = is_CN_char(test_str, pos)
+    if (cn_len > 0)
+    {
+        cn_char = strmid(test_str, pos, pos + cn_len)
+        msg "位置 " # pos # ": 中文 '" # cn_char # "'"
+    }
+    else
+    {
+        msg "位置 " # pos # ": 不是中文"
+    }
+}
+
+
+/*******************************分界符，以上为中英文可见字符位置查找函数实现**  *********************************/
+function just_line_line_line_line_line_line_line_line3(){}
+
+/////////////////////////////////////////////////////////////////////////////
+// 其他相关工具函数
+/////////////////////////////////////////////////////////////////////////////
+
+// trim_left - 去除字符串左边的空白字符（包括空格）
+// 返回: 去除左边空白后的字符串
+function trim_left(s)
+{
+    len = strlen(s)
+    
+    if (len == 0)
+    {
+        return s
+    }
+    
+    // 找到第一个非空白字符的位置
+    first_visible = find_visible_char_atbegin(s)
+    
+    if (first_visible == -1)
+    {
+        return ""  // 全部是空白字符
+    }
+    
+    return strmid(s, first_visible, len)
+}
+
+// trim_right - 去除字符串右边的空白字符（包括空格）
+// 返回: 去除右边空白后的字符串
+function trim_right(s)
+{
+    len = strlen(s)
+    
+    if (len == 0)
+    {
+        return s
+    }
+    
+    // 找到最后一个非空白字符的位置
+    i = len - 1
+    while (i >= 0)
+    {
+        ch = s[i]
+        
+        // 检查是否是可见字符（空格或控制字符）
+        if (is_visible_char(ch)){
+            break
+        }
+        i = i - 1
+    }
+    
+    if (i < 0)
+    {
+        return ""  // 全部是空白字符
+    }
+    
+    return strmid(s, 0, i + 1)
+}
+
+// trim - 去除字符串两端的空白字符（包括空格）
+// 返回: 去除两端空白后的字符串
+function trim(s)
+{
+    // 先去除左边空白
+    temp = trim_left(s)
+    // 再去除右边空白
+    return trim_right(temp)
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 相关的工具函数
+/////////////////////////////////////////////////////////////////////////////
+
+// trim_trailing_invisible - 去除末尾的连续不可见字符
+// 返回: 去除末尾不可见字符后的字符串
+function trim_trailing_invisible(s)
+{
+    len = strlen(s)
+    
+    if (len == 0)
+    {
+        return s
+    }
+    
+    // 找到末尾连续不可见字符的开始位置
+    invisible_start = find_unvisible_char_atend(s)
+    
+    if (invisible_start == -1)
+    {
+        return s  // 没有末尾不可见字符
+    }
+    
+    if (invisible_start == 0)
+    {
+        return ""  // 整个字符串都是不可见字符
+    }
+    
+    // 截取从开头到不可见字符开始位置之前的部分
+    return strmid(s, 0, invisible_start)
+}
+
+
+
+// get_trailing_invisible - 获取末尾的连续不可见字符
+// 返回: 末尾连续不可见字符的字符串
+function get_trailing_invisible(s)
+{
+    len = strlen(s)
+    
+    if (len == 0)
+    {
+        return ""
+    }
+    
+    invisible_start = find_unvisible_char_atend(s)
+    
+    if (invisible_start == -1)
+    {
+        return ""  // 没有末尾不可见字符
+    }
+    
+    if (invisible_start >= len)
+    {
+        return ""
+    }
+    
+    return strmid(s, invisible_start, len)
+}
+
+// has_trailing_invisible - 判断是否有末尾连续不可见字符
+// 返回: 1-有，0-没有
+function has_trailing_invisible(s)
+{
+    invisible_start = find_unvisible_char_atend(s)
+    if (invisible_start != -1 && invisible_start < strlen(s))
+    {
+        return 1
+    }
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 测试函数
+/////////////////////////////////////////////////////////////////////////////
+
+// test_trailing_invisible_functions - 测试末尾不可见字符函数
+function test_trailing_invisible_functions()
+{
+    msg "=== 测试末尾不可见字符函数 ==="
+    
+    // 测试用例1：末尾有空格
+    test1 = "Hello World   "
+    msg "测试字符串1: \"" # test1 # "\""
+    msg "字符串长度: " # strlen(test1)
+    
+    invisible_start1 = find_unvisible_char_atend(test1)
+    msg "末尾连续不可见字符开始位置: " # invisible_start1 # " (期望: 11，'d'后面第一个空格)"
+    
+    if (invisible_start1 != -1)
+    {
+        trailing = get_trailing_invisible(test1)
+        msg "末尾不可见字符: \"" # trailing # "\""
+        msg "末尾不可见字符长度: " # strlen(trailing)
+        
+        trimmed = trim_trailing_invisible(test1)
+        msg "去除后: \"" # trimmed # "\""
+        msg "去除后长度: " # strlen(trimmed)
+    }
+    
+    // 测试用例2：末尾有空格和换行符
+    test2 = "Test String  \n\t  "
+    msg "测试字符串2: 显示控制字符"
+    
+    // 显示字符详情
+    i = 0
+    while (i < strlen(test2) && i < 20)
+    {
+        ch = test2[i]
+        ascii = Char2Ascii(ch)
+        if (ascii == 32)
+        {
+            msg "位置 " # i # ": 空格"
+        }
+        else if (ascii == 9)
+        {
+            msg "位置 " # i # ": 制表符(\\t)"
+        }
+        else if (ascii == 10)
+        {
+            msg "位置 " # i # ": 换行符(\\n)"
+        }
+        else if (ascii >= 33 && ascii <= 126)
+        {
+            msg "位置 " # i # ": '" # ch # "'"
+        }
+        i = i + 1
+    }
+    
+    invisible_start2 = find_unvisible_char_atend(test2)
+    msg "末尾连续不可见字符开始位置: " # invisible_start2
+    
+    if (invisible_start2 != -1)
+    {
+        trailing2 = get_trailing_invisible(test2)
+        msg "末尾不可见字符长度: " # strlen(trailing2)
+        
+        trimmed2 = trim_trailing_invisible(test2)
+        msg "去除后: \"" # trimmed2 # "\""
+    }
+    
+    // 测试用例3：没有末尾不可见字符
+    test3 = "No trailing spaces"
+    msg "测试字符串3: \"" # test3 # "\""
+    
+    invisible_start3 = find_unvisible_char_atend(test3)
+    msg "末尾连续不可见字符开始位置: " # invisible_start3 # " (期望: -1，没有)"
+    
+    has_trailing = has_trailing_invisible(test3)
+    msg "是否有末尾不可见字符: " # has_trailing # " (期望: 0)"
+    
+    // 测试用例4：全是不可见字符
+    test4 = "   \t\n  "
+    msg "测试字符串4: 全是不可见字符"
+    
+    invisible_start4 = find_unvisible_char_atend(test4)
+    msg "末尾连续不可见字符开始位置: " # invisible_start4 # " (期望: 0，整个字符串都是)"
+    
+    if (invisible_start4 == 0)
+    {
+        trimmed4 = trim_trailing_invisible(test4)
+        msg "去除后长度: " # strlen(trimmed4) # " (期望: 0)"
+    }
+    
+    // 测试用例5：中英混合，末尾有空格
+    test5 = "Hello 世界！  "
+    msg "测试字符串5: \"" # test5 # "\""
+    
+    invisible_start5 = find_unvisible_char_atend(test5)
+    msg "末尾连续不可见字符开始位置: " # invisible_start5
+    
+    if (invisible_start5 != -1)
+    {
+        ch = test5[invisible_start5]
+        ascii = Char2Ascii(ch)
+        msg "开始位置字符ASCII: " # ascii # " (期望: 32，空格)"
+        
+        trimmed5 = trim_trailing_invisible(test5)
+        msg "去除后: \"" # trimmed5 # "\""
+    }
+    
+    // 测试扩展版本
+    msg "--- 测试扩展版本 ---"
+    test6 = "Text with commas,,,  "
+    msg "测试字符串6: \"" # test6 # "\""
+    
+    // 默认情况：逗号是可见的
+    invisible_start6a = find_unvisible_char_atend(test6)
+    msg "默认 - 末尾连续不可见字符开始位置: " # invisible_start6a
+    
+    
+    msg "=== 末尾不可见字符测试结束 ==="
+}
+
+// quick_test_trailing - 快速测试末尾不可见字符
+function quick_test_trailing()
+{
+    msg "快速测试末尾不可见字符函数:"
+    
+    test_str = "Hello World   \t"
+    msg "测试字符串: 显示控制字符"
+    
+    // 显示字符串
+    i = 0
+    while (i < strlen(test_str))
+    {
+        ch = test_str[i]
+        ascii = Char2Ascii(ch)
         if (ascii == 32)
         {
             msg "位置 " # i # ": 空格"
@@ -1852,197 +2697,36 @@ macro test_complex_string()
         }
         else if (ascii == 10)
         {
-            msg "位置 " # i # ": 换行符(\\n)"
-        }
-        else if (ascii == 13)
-        {
-            msg "位置 " # i # ": 回车符(\\r)"
+            msg "位置 " # i # ": 换行符"
         }
         else if (ascii >= 33 && ascii <= 126)
         {
-            msg "位置 " # i # ": '" # ch # "' (ASCII " # ascii # ")"
+            msg "位置 " # i # ": '" # ch # "'"
         }
-        else
-        {
-            msg "位置 " # i # ": 控制字符(ASCII " # ascii # ")"
-        }
+        i = i + 1
+    }
+    
+    invisible_start = find_unvisible_char_atend(test_str)
+    msg "末尾连续不可见字符开始位置: " # invisible_start
+    
+    if (invisible_start != -1)
+    {
+        trailing = get_trailing_invisible(test_str)
+        msg "末尾不可见字符长度: " # strlen(trailing)
         
-        i = i + 1
+        trimmed = trim_trailing_invisible(test_str)
+        msg "去除后: \"" # trimmed # "\""
+        msg "去除后长度: " # strlen(trimmed)
     }
     
-    msg "=== 复杂字符串测试结束 ==="
-}
-
-// test_multiline_string - 测试新增函数（使用实际换行符）
-macro test_multiline_string()
-{
-   
-
-    msg "=== 测试新增函数（使用实际换行符） ==="
+    // 测试第一个可见字符
+    first_visible = find_visible_char_atbegin(test_str)
+    msg "第一个可见字符位置（跳过空格）: " # first_visible
     
-//    currentbuf=GetCurrentBuf()
-//    currentselection=GetBufSelText (currentbuf)//获取当前选中行的文字(只有1行)
-    
-//    hbuf=newbuf("ets")
-//    hwnd=NewWnd (hbuf)
-//    SetBufSelText(hbuf,GetBufSelText (currentbuf))
-    
-//测试文本,测试前请用鼠标选择这几行,选中后将作为测试字符串
-/*1 Line 1
-  2Line 2
-  3Line 3
-//4Line 4 */
-//5Line 5
-
-    // 创建测试字符串（使用实际换行符）
-    test_str = create_multilines_test_string()
-    msg "选择文本为:@test_str@" 
-    msg "测试字符串创建成功，长度: " # strlen(currentselection)
-    
-    // 1. 测试get_line_count
-    msg "--- 测试get_line_count ---"
-    lines = get_line_count(test_str)
-    msg "行数: " # lines # " (期望: 5)"
-    
-    // 显示字符串的ASCII值以验证
-    msg "验证字符串中的换行符:"
-    i = 0
-    newline_count = 0
-    while (i < strlen(test_str) && i < 50)  // 限制显示数量
+    if (first_visible != -1)
     {
-        ascii = AsciiFromChar(test_str[i])
-        if (ascii == 10)
-        {
-            newline_count = newline_count + 1
-        }
-        i = i + 1
+        ch = test_str[first_visible]
+        msg "第一个可见字符: '" # ch # "'"
     }
-    msg "总共找到 " # newline_count # " 个换行符"
-    
-    // 2. 测试get_line_content
-    msg "--- 测试get_line_content ---"
-    line3 = get_line_content(test_str, 3)
-    line3_len = strlen(line3)
-    msg "第3行内容: \"" # line3 # "\""
-    msg "第3行长度: " # line3_len
-    
-    // 3. 测试find_strln_frombegin
-    msg "--- 测试find_strln_frombegin ---"
-    first_line = find_strln_frombegin(test_str, "Line 3")
-    msg "第一个包含'Line 3'的行: " # first_line # " (期望: 3)"
-    
-    // 4. 测试find_strln_fromend
-    msg "--- 测试find_strln_fromend ---"
-    last_line = find_strln_fromend(test_str, "Line")
-    msg "最后一个包含'Line'的行: " # last_line # " (期望: 5)"
-    
-    // 5. 测试str_insert_line
-    msg "--- 测试str_insert_line ---"
-    // 创建要插入的字符串（也使用实际换行符）
-    newline = CharFromAscii(10)
-    str_inserting = "Inserted line"
-    inserted = str_insert_line(test_str, 3, str_inserting)
-    inserted_lines = get_line_count(inserted)
-    msg "在第3行插入后的行数: " # inserted_lines # " (期望: 6)"
-    
-    // 显示插入后的内容
-    if (inserted_lines > 0)
-    {
-        msg "插入后的第3行: \"" # get_line_content(inserted, 3) # "\""
-    }
-    
-    // 6. 测试str_delete_line（使用简化版本）
-    msg "--- 测试str_delete_line ---"
-    deleted = str_delete_line(test_str, 2)
-    deleted_lines = get_line_count(deleted)
-    msg "删除第2行后的行数: " # deleted_lines # " (期望: 4)"
-    
-    // 显示删除后的内容
-    if (deleted_lines > 0)
-    {
-        msg "删除后第1行: \"" # get_line_content(deleted, 1) # "\""
-        msg "删除后第2行: \"" # get_line_content(deleted, 2) # "\""
-        msg "删除后第3行: \"" # get_line_content(deleted, 3) # "\""
-    }
-    
-
-    // 8. 测试replace_once_from_begin
-    msg "--- 测试replace_once_from_begin ---"
-    replaced = replace_once_from_begin("abc def abc ghi", "abc", "XYZ")
-    msg "替换第一个'abc': \"" # replaced # "\" (期望: \"XYZ def abc ghi\")"
-    
-    // 9. 测试replace_all
-    msg "--- 测试replace_all ---"
-    all_replaced = replace_all("abc def abc ghi", "abc", "XYZ")
-    msg "替换所有'abc': \"" # all_replaced # "\" (期望: \"XYZ def XYZ ghi\")"
-    
-    // 10. 测试位置操作
-    msg "--- 测试位置操作 ---"
-    pos_inserted = str_insert("Hello World", 5, " Beautiful")
-    msg "在位置5插入: \"" # pos_inserted # "\" (期望: \"Hello Beautiful World\")"
-    
-    msg "=== 新增函数测试结束 ==="
-    test_str_delete_line_edge_cases()
 }
-
-// test_str_delete_line_edge_cases - 专门测试删除行的边界情况
-function test_str_delete_line_edge_cases()
-{
-    msg "=== 测试删除行边界情况 ==="
-    newline = CharFromAscii(10)
-    
-    // 测试1: 只有一行的字符串
-    msg "--- 测试1: 只有一行 ---"
-    single_line = "Only one line"
-    deleted1 = str_delete_line(single_line, 1)
-    msg "原始: \"" # single_line # "\""
-    msg "删除后: \"" # deleted1 # "\" (期望: 空字符串)"
-    msg "删除后长度: " # strlen(deleted1)
-    
-    // 测试2: 删除第一行
-    msg "--- 测试2: 删除第一行 ---"
-    two_lines = "First line"
-    two_lines = cat(two_lines, newline)
-    two_lines = cat(two_lines, "Second line")
-    
-    deleted_first = str_delete_line(two_lines, 1)
-    msg "原始: \"" # two_lines # "\""
-    msg "删除第一行后: \"" # deleted_first # "\""
-    msg "删除后行数: " # get_line_count(deleted_first) # " (期望: 1)"
-    
-    // 测试3: 删除最后一行
-    msg "--- 测试3: 删除最后一行 ---"
-    deleted_last = str_delete_line(two_lines, 2)
-    msg "删除最后一行后: \"" # deleted_last # "\""
-    msg "删除后行数: " # get_line_count(deleted_last) # " (期望: 1)"
-    
-    // 测试4: 删除中间行
-    msg "--- 测试4: 删除中间行 ---"
-    three_lines = "Line 1"
-    three_lines = cat(three_lines, newline)
-    three_lines = cat(three_lines, "Line 2")
-    three_lines = cat(three_lines, newline)
-    three_lines = cat(three_lines, "Line 3")
-    
-    deleted_middle = str_delete_line(three_lines, 2)
-    msg "原始: \"" # three_lines # "\""
-    msg "删除中间行后: \"" # deleted_middle # "\""
-    msg "删除后行数: " # get_line_count(deleted_middle) # " (期望: 2)"
-    
-    // 测试5: 以换行符结尾的字符串
-    msg "--- 测试5: 以换行符结尾 ---"
-    with_trailing_nl = "Line 1"
-    with_trailing_nl = cat(with_trailing_nl, newline)
-    with_trailing_nl = cat(with_trailing_nl, "Line 2")
-    with_trailing_nl = cat(with_trailing_nl, newline)
-    
-    deleted_trailing = str_delete_line(with_trailing_nl, 3)
-    msg "原始: \"" # with_trailing_nl # "\""
-    msg "删除最后一行后: \"" # deleted_trailing # "\""
-    msg "删除后长度: " # strlen(deleted_trailing)
-    msg "删除后最后字符ASCII: " # AsciiFromChar(deleted_trailing[strlen(deleted_trailing)-1])
-    
-    msg "=== 删除行边界测试结束 ==="
-}
-
 

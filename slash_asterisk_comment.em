@@ -45,7 +45,7 @@ macro slash_asterisk_SingleLineComment()
 
             selectlnstr=cat(selectlnstr_left,selectlnstr_middle) //重组第一行字符串
             selectlnstr=cat(selectlnstr,selectlnstr_right)    //重组最后一行字符串
-            //msg "单行未选择代码模式,取消注释,selectlnstr为@selectlnstr@"
+            msg "单行未选择代码模式,取消注释,selectlnstr为@selectlnstr@"
             PutBufLine(hbuf,lnSelect,selectlnstr) //替换选择行
             sel.ichFirst=fisrt_visiblecharindex
             sel.ichLim=sel.ichFirst+last_visiblecharindex-fisrt_visiblecharindex-4
@@ -54,7 +54,7 @@ macro slash_asterisk_SingleLineComment()
             //如果没有注释,加注释
             fisrt_visiblecharindex=find_first_visible_char(selectlnstr_middle) //第一个可见字符的索引位置
             last_visiblecharindex=find_last_visible_char(selectlnstr_middle) //最后一个可见字符的索引位置
-            //msg "第一个可见字符索引为@fisrt_visiblecharindex@,最后一个可见字符索引为@last_visiblecharindex@"
+            msg "第一个可见字符索引为@fisrt_visiblecharindex@,最后一个可见字符索引为@last_visiblecharindex@"
 
             //注意顺序,先插入后一个字符,否则第二次插入的字符索引位置会变化
             selectlnstr_middle=str_insert(selectlnstr_middle,last_visiblecharindex+1,"*/") //结尾插入*/
@@ -62,7 +62,7 @@ macro slash_asterisk_SingleLineComment()
 
             selectlnstr=cat(selectlnstr_left,selectlnstr_middle) //重组第一行字符串
             selectlnstr=cat(selectlnstr,selectlnstr_right)    //重组最后一行字符串
-            //msg "单行未选择代码模式,增加注释,selectlnstr为@selectlnstr@"
+            msg "单行未选择代码模式,增加注释,selectlnstr为@selectlnstr@"
             PutBufLine(hbuf,lnSelect,selectlnstr) //替换选择行
             sel.ichFirst=fisrt_visiblecharindex
             sel.ichLim=sel.ichFirst+last_visiblecharindex+1-fisrt_visiblecharindex+4
@@ -92,7 +92,7 @@ macro slash_asterisk_SingleLineComment()
 
             selectlnstr=cat(selectlnstr_left,selectlnstr_middle) //重组第一行字符串
             selectlnstr=cat(selectlnstr,selectlnstr_right)    //重组最后一行字符串
-            //msg "单行选择代码模式,取消注释,selectlnstr为@selectlnstr@"
+            msg "单行选择代码模式,取消注释,selectlnstr为@selectlnstr@"
             PutBufLine(hbuf,lnSelect,selectlnstr) //替换选择行
             sel.ichFirst=sel.ichFirst
             sel.ichLim=sel.ichFirst+strlen(selectlnstr_middle)
@@ -106,14 +106,14 @@ macro slash_asterisk_SingleLineComment()
             //注意顺序,先插入后一个字符,否则第二次插入的字符索引位置会变化
             selectlnstr_middle=str_insert(selectlnstr_middle,last_visiblecharindex+1,"*/") //结尾插入*/
             selectlnstr_middle=str_insert(selectlnstr_middle,fisrt_visiblecharindex,"/*") //开头插入/*
-            //msg "单行选择代码模式,增加注释,selectlnstr_left为@selectlnstr_left@"
-            //msg "单行选择代码模式,增加注释,selectlnstr_middle为@selectlnstr_middle@"
-            //msg "单行选择代码模式,增加注释,selectlnstr_right为@selectlnstr_right@"
+            msg "单行选择代码模式,增加注释,selectlnstr_left为@selectlnstr_left@"
+            msg "单行选择代码模式,增加注释,selectlnstr_middle为@selectlnstr_middle@"
+            msg "单行选择代码模式,增加注释,selectlnstr_right为@selectlnstr_right@"
 
 
             selectlnstr=cat(selectlnstr_left,selectlnstr_middle) //重组第一行字符串
             selectlnstr=cat(selectlnstr,selectlnstr_right)    //重组最后一行字符串
-            //msg "单行选择代码模式,增加注释,selectlnstr为@selectlnstr@"
+            msg "单行选择代码模式,增加注释,selectlnstr为@selectlnstr@"
             PutBufLine(hbuf,lnSelect,selectlnstr) //替换选择行
             sel.ichFirst=sel.ichFirst+fisrt_visiblecharindex
             sel.ichLim=sel.ichFirst+strlen(selectlnstr_middle)
@@ -149,9 +149,9 @@ macro slash_asterisk_SingleLineComment()
             lastlnstr_left=replace_once_from_end(lastlnstr_left,"*/","") //替换*/为空
             lastlnstr=cat(lastlnstr_left,lastlnstr_right) //重组最后一行字符串
             
-            //msg "多行模式,取消注释,firstlnstr为@firstlnstr@"
+            msg "多行模式,取消注释,firstlnstr为@firstlnstr@"
             PutBufLine(hbuf,lnFirst,firstlnstr)
-            //msg "多行模式,取消注释,lastlnstr为@lastlnstr@"
+            msg "多行模式,取消注释,lastlnstr为@lastlnstr@"
             PutBufLine(hbuf,lnLast,lastlnstr)
             sel.ichFirst=sel.ichFirst
             sel.ichLim=sel.ichLim-2
@@ -167,9 +167,9 @@ macro slash_asterisk_SingleLineComment()
             firstlnstr_right=str_insert(firstlnstr_right,fisrt_visiblecharindex,"/*") //开头插入/*
             firstlnstr=cat(firstlnstr_left,firstlnstr_right) //重组第一行字符串
             
-            //msg "多行模式,增加注释,firstlnstr为@firstlnstr@"
+            msg "多行模式,增加注释,firstlnstr为@firstlnstr@"
             PutBufLine(hbuf,lnFirst,firstlnstr)
-            //msg "多行模式,增加注释,lastlnstr为@lastlnstr@"
+            msg "多行模式,增加注释,lastlnstr为@lastlnstr@"
             PutBufLine(hbuf,lnLast,lastlnstr)
             sel.ichFirst=sel.ichFirst
             sel.ichLim=sel.ichLim+2
@@ -213,11 +213,11 @@ macro slash_asterisk_AddMacroComment()
 
     while(index<strlen(szCodeStart))
     {
-        if(AsciiFromChar(szCodeStart[index])== 9) //9是Tab字符的ASCII
+        if(Char2Ascii(szCodeStart[index])== 9) //9是Tab字符的ASCII
         {
             start_space_count = start_space_count +4
         }
-        if(AsciiFromChar(szCodeStart[index])== 32) //32是空格字符的ASCII
+        if(Char2Ascii(szCodeStart[index])== 32) //32是空格字符的ASCII
         {
             start_space_count = start_space_count +1
         }
@@ -227,11 +227,11 @@ macro slash_asterisk_AddMacroComment()
     index = 0
     while(index<strlen(szCodeEnd))
     {
-        if(AsciiFromChar(szCodeStart[index])== 9) //9是Tab字符的ASCII
+        if(Char2Ascii(szCodeStart[index])== 9) //9是Tab字符的ASCII
         {
             start_space_count = start_space_count +4
         }
-        if(AsciiFromChar(szCodeStart[index])== 32) //32是空格字符的ASCII
+        if(Char2Ascii(szCodeStart[index])== 32) //32是空格字符的ASCII
         {
             start_space_count = start_space_count +1
         }
@@ -309,11 +309,11 @@ macro slash_asterisk_MultiLineComment()
 
     while(index<strlen(szCodeStart))
     {
-        if(AsciiFromChar(szCodeStart[index])== 9) //9是Tab字符的ASCII
+        if(Char2Ascii(szCodeStart[index])== 9) //9是Tab字符的ASCII
         {
             start_space_count = start_space_count +4
         }
-        if(AsciiFromChar(szCodeStart[index])== 32) //32是空格字符的ASCII
+        if(Char2Ascii(szCodeStart[index])== 32) //32是空格字符的ASCII
         {
             start_space_count = start_space_count +1
         }
@@ -323,7 +323,7 @@ macro slash_asterisk_MultiLineComment()
     index = 0
     while(index<strlen(szCodeEnd))
     {
-        if(AsciiFromChar(szCodeEnd[index])== 9)
+        if(Char2Ascii(szCodeEnd[index])== 9)
         {
             end_space_count=end_space_count+1
         }
@@ -470,8 +470,8 @@ function strcmp(s1, s2)
     {
         ch1 = s1[i]  // 注意：这里返回的是字符串，如"o"，而不是字符'o'
         ch2 = s2[i]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if (ascii1 != ascii2)
         {
@@ -513,8 +513,8 @@ function strncmp(s1, s2, n)
     {
         ch1 = s1[i]
         ch2 = s2[i]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if (ascii1 != ascii2)
         {
@@ -573,8 +573,8 @@ function stricmp(s1, s2)
         ch1_lower = tolower(ch1)
         ch2_lower = tolower(ch2)
         
-        ascii1 = AsciiFromChar(ch1_lower)
-        ascii2 = AsciiFromChar(ch2_lower)
+        ascii1 = Char2Ascii(ch1_lower)
+        ascii2 = Char2Ascii(ch2_lower)
         
         if (ascii1 != ascii2)
         {
@@ -600,8 +600,8 @@ function strchr(s, ch)
     {
         // 注意：s[i]返回的是字符串，ch也是字符串，需要转换为ASCII比较
         ch_from_str = s[i]
-        ascii_from_str = AsciiFromChar(ch_from_str)
-        ascii_ch = AsciiFromChar(ch)
+        ascii_from_str = Char2Ascii(ch_from_str)
+        ascii_ch = Char2Ascii(ch)
         
         if (ascii_from_str == ascii_ch)
         {
@@ -618,12 +618,12 @@ function strrchr(s, ch)
 {
     len = strlen(s)
     i = len - 1
-    ascii_ch = AsciiFromChar(ch)
+    ascii_ch = Char2Ascii(ch)
     
     while (i >= 0)
     {
         ch_from_str = s[i]
-        ascii_from_str = AsciiFromChar(ch_from_str)
+        ascii_from_str = Char2Ascii(ch_from_str)
         
         if (ascii_from_str == ascii_ch)
         {
@@ -662,8 +662,8 @@ function strstr(main_str, sub_str)
     {       
         ch1 = main_str[i]
         ch2 = sub_str[0]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if(ascii1 == 10){
             ln=ln+1 //下一行开始,行数增加
@@ -677,8 +677,8 @@ function strstr(main_str, sub_str)
                 // 比较字符的ASCII值
                 ch1 = main_str[i + j]
                 ch2 = sub_str[j]
-                ascii1 = AsciiFromChar(ch1)
-                ascii2 = AsciiFromChar(ch2)
+                ascii1 = Char2Ascii(ch1)
+                ascii2 = Char2Ascii(ch2)
                 if (ascii1 != ascii2)
                 {
                     break
@@ -726,7 +726,7 @@ function strpbrk(s, accept)
     k = 0
     while (k < accept_len)
     {
-        ascii_val = AsciiFromChar(accept[k])
+        ascii_val = Char2Ascii(accept[k])
         ascii_list = cat(ascii_list, CharFromAscii(ascii_val))
         k = k + 1
     }
@@ -735,13 +735,13 @@ function strpbrk(s, accept)
     while (i < s_len)
     {
         ch = s[i]
-        ascii_ch = AsciiFromChar(ch)
+        ascii_ch = Char2Ascii(ch)
         
         // 在ascii_list中查找
         j = 0
         while (j < accept_len)
         {
-            ascii_accept = AsciiFromChar(ascii_list[j])
+            ascii_accept = Char2Ascii(ascii_list[j])
             if (ascii_ch == ascii_accept)
             {
                 return i
@@ -842,7 +842,7 @@ function strspn(s, accept)
     k = 0
     while (k < accept_len)
     {
-        ascii_val = AsciiFromChar(accept[k])
+        ascii_val = Char2Ascii(accept[k])
         accept_ascii = cat(accept_ascii, CharFromAscii(ascii_val))
         k = k + 1
     }
@@ -853,13 +853,13 @@ function strspn(s, accept)
     while (i < s_len)
     {
         ch = s[i]
-        ascii_ch = AsciiFromChar(ch)
+        ascii_ch = Char2Ascii(ch)
         found = 0
         
         j = 0
         while (j < accept_len)
         {
-            ascii_accept = AsciiFromChar(accept_ascii[j])
+            ascii_accept = Char2Ascii(accept_ascii[j])
             if (ascii_ch == ascii_accept)
             {
                 found = 1
@@ -892,7 +892,7 @@ function strcspn(s, reject)
     k = 0
     while (k < reject_len)
     {
-        ascii_val = AsciiFromChar(reject[k])
+        ascii_val = Char2Ascii(reject[k])
         reject_ascii = cat(reject_ascii, CharFromAscii(ascii_val))
         k = k + 1
     }
@@ -903,13 +903,13 @@ function strcspn(s, reject)
     while (i < s_len)
     {
         ch = s[i]
-        ascii_ch = AsciiFromChar(ch)
+        ascii_ch = Char2Ascii(ch)
         found = 0
         
         j = 0
         while (j < reject_len)
         {
-            ascii_reject = AsciiFromChar(reject_ascii[j])
+            ascii_reject = Char2Ascii(reject_ascii[j])
             if (ascii_ch == ascii_reject)
             {
                 found = 1
@@ -993,7 +993,7 @@ function isdigit(ch)
         return 0
     }
     
-    ascii = AsciiFromChar(ch)
+    ascii = Char2Ascii(ch)
     
     if (ascii >= 48)
     {
@@ -1025,7 +1025,7 @@ function isspace(ch)
         return 0
     }
     
-    ascii = AsciiFromChar(ch)
+    ascii = Char2Ascii(ch)
     
     if (ascii == 32)
     {
@@ -1139,7 +1139,7 @@ function contains_special_chars(s)
     while (i < len)
     {
         ch = s[i]
-        ascii = AsciiFromChar(ch)
+        ascii = Char2Ascii(ch)
         
         // 检查是否是控制字符（ASCII < 32）或删除字符（127）
         if (ascii < 32 || ascii == 127)
@@ -1160,7 +1160,11 @@ function is_printable_char(ch)
         return 0
     }
     
-    ascii = AsciiFromChar(ch)
+    ascii = Char2Ascii(ch)
+    
+    if (ascii < 0)    {
+        return 1
+    }
     
     // 可打印字符范围：空格(32)到波浪号(126)
     // 可打印字符范围：如果大于127,也视为可打印字符,有可能有utf8中文
@@ -1180,18 +1184,17 @@ function is_visible_char(ch)
     {
         return 0
     }
-    ascii = AsciiFromChar(ch)
+    ascii = Char2Ascii(ch)
     
-    if (ascii < 33) //空格也作为不可见字符
+    if (ascii < 0)    {
+        return 1
+    }
+
+    if (ascii < 33 || ascii == 127) //空格也作为不可见字符
     {
         return 0
     }
     
-    // delete字符不可见
-    if (ascii == 127)
-    {
-        return 0
-    }
     
     return 1
 
@@ -1209,13 +1212,13 @@ function unescape_string(s)
     while (i < len)
     {
         ch = s[i]
-        ascii = AsciiFromChar(ch)
+        ascii = Char2Ascii(ch)
         
         // 检查是否是反斜杠
         if (ascii == 92 && i + 1 < len)  // 反斜杠
         {
             next_ch = s[i + 1]
-            next_ascii = AsciiFromChar(next_ch)
+            next_ascii = Char2Ascii(next_ch)
             
             if (next_ascii == 116)  // t -> \t
             {
@@ -1252,8 +1255,8 @@ function unescape_string(s)
                 // 尝试解析十六进制
                 hex1 = s[i + 2]
                 hex2 = s[i + 3]
-                ascii1 = AsciiFromChar(hex1)
-                ascii2 = AsciiFromChar(hex2)
+                ascii1 = Char2Ascii(hex1)
+                ascii2 = Char2Ascii(hex2)
                 
                 value = 0
                 
@@ -1325,7 +1328,7 @@ function get_line_count(s)
     while (i < len)
     {
         ch = s[i]
-        ascii = AsciiFromChar(ch)
+        ascii = Char2Ascii(ch)
         
         if (ascii == 10)  // 换行符
         {
@@ -1389,12 +1392,12 @@ function find_strln_frombegin(main_str, sub_str)
     first_matchindex=-1 //第一次匹配所在的位置
     last_matchindex=-1 //最后一次匹配所在位置
     match=0 //是否匹配成功
-    ////msg "主字符串长度:@main_str_len@,子字符串长度:@sub_str_len@"
+    //msg "主字符串长度:@main_str_len@,子字符串长度:@sub_str_len@"
      // 如果sub_str_len为空字符串，返回-1
     // 如果sub_str_len比main_str_len长，不可能找到
     if (sub_str_len == 0 || sub_str_len > main_str_len)
     {
-        ////msg "sub_str_len比main_str_len长，不可能找到"
+        //msg "sub_str_len比main_str_len长，不可能找到"
         return -1
     }
     
@@ -1404,8 +1407,8 @@ function find_strln_frombegin(main_str, sub_str)
     {       
         ch1 = main_str[i]
         ch2 = sub_str[0]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if(ascii1 == 10){
             ln=ln+1 //下一行开始,行数增加
@@ -1418,8 +1421,8 @@ function find_strln_frombegin(main_str, sub_str)
                 // 比较字符的ASCII值
                 ch1 = main_str[i + j]
                 ch2 = sub_str[j]
-                ascii1 = AsciiFromChar(ch1)
-                ascii2 = AsciiFromChar(ch2)
+                ascii1 = Char2Ascii(ch1)
+                ascii2 = Char2Ascii(ch2)
                 if (ascii1 != ascii2)
                 {
                     break
@@ -1482,8 +1485,8 @@ function find_strln_fromend(main_str, sub_str)
     {       
         ch1 = main_str[i]
         ch2 = sub_str[0]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if(ascii1 == 10){
             ln=ln+1 //下一行开始,行数增加
@@ -1497,8 +1500,8 @@ function find_strln_fromend(main_str, sub_str)
                 // 比较字符的ASCII值
                 ch1 = main_str[i + j]
                 ch2 = sub_str[j]
-                ascii1 = AsciiFromChar(ch1)
-                ascii2 = AsciiFromChar(ch2)
+                ascii1 = Char2Ascii(ch1)
+                ascii2 = Char2Ascii(ch2)
                 if (ascii1 != ascii2)
                 {
                     break
@@ -1543,7 +1546,7 @@ function get_line_content(s, line_num)
     len = strlen(s)
     total_lines = get_line_count(s)
     str = ""
-    ////msg "行数有@total_lines@行,字符串长度为@len@"
+    //msg "行数有@total_lines@行,字符串长度为@len@"
     if (len == 0 )
     {
         return ""
@@ -1563,7 +1566,7 @@ function get_line_content(s, line_num)
        line_num = total_lines
     }    
 
-    ////msg "获取第@line_num@行"
+    //msg "获取第@line_num@行"
     
 //情况1:字符串只有1行,只可能获取一行
     if (total_lines == 1)
@@ -1581,7 +1584,7 @@ function get_line_content(s, line_num)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             if (ascii == 10)  // 找到第1个换行符位置
             {
                 break;
@@ -1591,7 +1594,7 @@ function get_line_content(s, line_num)
         
         //直接返回字符串,不含第一行末尾换行符
         str =strmid(s,0,i)
-        ////msg "获取第1行@str@"
+        //msg "获取第1行@str@"
         return str
     }else{
 
@@ -1603,7 +1606,7 @@ function get_line_content(s, line_num)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             
             if (ascii == 10)  // 换行符
             {
@@ -1612,13 +1615,13 @@ function get_line_content(s, line_num)
                 //找到第n-1个换行符时标记前一半结束位置
                 if(num==line_num-1){
                     first_index=i
-                    ////msg "first_index为@first_index@"
+                    //msg "first_index为@first_index@"
                 }
                 
                 //找到第n个换行符时标记后一半开始位置(当要删除最后一行时,不存在)
                 if(num==line_num){
                     second_index=i
-                    ////msg "second_index为@second_index@"
+                    //msg "second_index为@second_index@"
                     break
                 }
             }
@@ -1633,7 +1636,7 @@ function get_line_content(s, line_num)
             //能找到第n个换行符,说明获取的中间行
 
             str=strmid(s,first_index+1,second_index)
-            ////msg "获取中间行,字符串为@str@"
+            //msg "获取中间行,字符串为@str@"
             return str
         }else{
             //找不到第n个换行符,说明获取的最后一行
@@ -1641,11 +1644,11 @@ function get_line_content(s, line_num)
             if(first_index+1 >len){
                 //最后一行时空行,无内容
                 str=""
-                ////msg "最后一行空行,获取最后一行,字符串为@str@"
+                //msg "最后一行空行,获取最后一行,字符串为@str@"
                 return str 
             }else{
                 str=strmid(s,first_index+1,len)
-                ////msg "最后一行非空,字符串为@str@"
+                //msg "最后一行非空,字符串为@str@"
                 return str
             }
         }
@@ -1714,7 +1717,7 @@ function str_insert_line(s, line_num, str_insert)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             
             if (ascii == 10)  // 换行符
             {
@@ -1723,14 +1726,14 @@ function str_insert_line(s, line_num, str_insert)
                 //找到第n-1个换行符时标记前一半结束位置
                 if(num==line_num-1){
                     first_index=i
-                    ////msg "first_index为@first_index@"
+                    //msg "first_index为@first_index@"
                     break
                 }
                 
                 //找到第n个换行符时标记后一半开始位置(当要找最后一行时,不存在)
                 if(num==line_num){
                     second_index=i
-                    ////msg "second_index为@second_index@"
+                    //msg "second_index为@second_index@"
                     
                 }
             }                
@@ -1799,7 +1802,7 @@ function str_delete_line(s, line_num)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             if (ascii == 10)  // 找到第1个换行符位置
             {
                 break;
@@ -1820,7 +1823,7 @@ function str_delete_line(s, line_num)
         while (i < len)
         {
             ch = s[i]
-            ascii = AsciiFromChar(ch)
+            ascii = Char2Ascii(ch)
             
             if (ascii == 10)  // 换行符
             {
@@ -1829,14 +1832,14 @@ function str_delete_line(s, line_num)
                 //找到第n-1个换行符时标记前一半结束位置
                 if(num==line_num-1){
                     first_index=i
-                    ////msg "first_index为@first_index@"
+                    //msg "first_index为@first_index@"
                     
                 }
                 
                 //找到第n个换行符时标记后一半开始位置(当要找最后一行时,不存在)
                 if(num==line_num){
                     second_index=i
-                    ////msg "second_index为@second_index@"
+                    //msg "second_index为@second_index@"
                     break
                 }
             } 
@@ -1930,8 +1933,8 @@ function strstr_fromend(main_str, sub_str)
     {       
         ch1 = main_str[i]
         ch2 = sub_str[0]
-        ascii1 = AsciiFromChar(ch1)
-        ascii2 = AsciiFromChar(ch2)
+        ascii1 = Char2Ascii(ch1)
+        ascii2 = Char2Ascii(ch2)
         
         if(ascii1 == 10){
             ln=ln+1 //下一行开始,行数增加
@@ -1945,8 +1948,8 @@ function strstr_fromend(main_str, sub_str)
                 // 比较字符的ASCII值
                 ch1 = main_str[i + j]
                 ch2 = sub_str[j]
-                ascii1 = AsciiFromChar(ch1)
-                ascii2 = AsciiFromChar(ch2)
+                ascii1 = Char2Ascii(ch1)
+                ascii2 = Char2Ascii(ch2)
                 if (ascii1 != ascii2)
                 {
                     break
@@ -2111,10 +2114,10 @@ function str_get(s, position, length)
 function replace_once_from_begin(s, old_str, new_str)
 {
     pos = strstr(s, old_str)
-    ////msg "原字符串位置为@pos@"
+    //msg "原字符串位置为@pos@"
     if (pos == -1)
     {
-        ////msg "未找到，返回原字符串"
+        //msg "未找到，返回原字符串"
         return s  // 未找到，返回原字符串
     }
     
