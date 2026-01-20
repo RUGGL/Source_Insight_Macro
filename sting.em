@@ -1,3 +1,7 @@
+
+/*******************************分界符，以下为基础字符串函数**  *********************************/
+function just_line_line_line_line_line_line_line_line0(){}
+
 // string.em - C语言字符串函数实现
 // 基于Source Insight宏语言实现
 /*
@@ -83,14 +87,19 @@ function is_printable_char(ch)
     
     ascii = Char2Ascii(ch)
     
+    if (ascii < 0)    {
+        return 1
+    }
+    
     // 可打印字符范围：空格(32)到波浪号(126)
     // 可打印字符范围：如果大于127,也视为可打印字符,有可能有utf8中文
-    if (ascii < 32 || ascii ==127)
+    if (ascii >= 32)
     {
-       return 0
+       return 1
     }
 
-    return 1
+    return 0
+
 }
 
 
@@ -103,18 +112,46 @@ function is_visible_char(ch)
     {
         return 0
     }
-    
     ascii = Char2Ascii(ch)
-
     
-    if (ascii < 33 || ascii ==127)
+    if (ascii < 0)    {
+        return 1
+    }
+
+    if (ascii < 33 || ascii == 127) //空格也作为不可见字符
     {
         return 0
     }
     
+    
     return 1
+
+}
+/////////////////////////////////////////////////////////////////////////////
+// 取小值函数
+/////////////////////////////////////////////////////////////////////////////
+
+function min(a,b){
+    c=a-b
+    if(c>0){
+        return b
+    }else{
+        return a
+    }
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// 取大值函数
+/////////////////////////////////////////////////////////////////////////////
+
+function man(a,b){
+    c=a-b
+    if(c<0){
+        return b
+    }else{
+        return a
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // 字符串比较函数
@@ -699,24 +736,42 @@ function isspace(ch)
     {
         return 0
     }
-    
+
     ascii = Char2Ascii(ch)
     
-    // 检查是否是空格
     if (ascii == 32)
     {
-        return 1  // 空格是不可见字符
+        return 1  // 空格
     }
     
-    // 检查是否是ASCII控制字符
-    if (ascii < 32 || ascii == 127)
+    if (ascii == 9)  // 制表符 \t
     {
-        return 1  // 控制字符是不可见字符
+        return 1
     }
-
+    
+    if (ascii == 10)  // 换行 \n
+    {
+        return 1
+    }
+    
+    if (ascii == 13)  // 回车 \r
+    {
+        return 1
+    }
+    
+    if (ascii == 11)  // 垂直制表符
+    {
+        return 1
+    }
+    
+    if (ascii == 12)  // 换页
+    {
+        return 1
+    }
     
     return 0
 }
+
 
 // strrev - 反转字符串
 // 返回: 反转后的字符串
@@ -743,6 +798,48 @@ function strrev(s)
 // 返回: 去除空白后的字符串
 function strtrim(s)
 {
+    str=s
+    len = strlen(s)
+    //msg "接收字符串为@str@,str长度为@len@"
+    if (len == 0)
+    {
+        return s
+    }
+    
+    // 找到第一个非空白字符
+    first_i = -1
+    last_i = 0
+    i=0
+    while (i < len)
+    {
+        ch = str[i]
+        if (is_visible_char(ch))
+        {
+            if(first_i==-1){
+                first_i=i
+            }
+            last_i=i
+        }
+        i = i + 1
+    }
+    
+    // 如果整个字符串都是空白
+    if (first_i == -1)
+    {
+        return ""
+    }
+    
+    //msg "第一个可见字符索引为@first_i@,最后一个可见字符索引为@last_i@"
+    // 提取子串
+    str=strmid(str, first_i, last_i + 1)
+    //msg "处理后字符串为@str@,str长度为@len@"
+    return str
+}
+
+// trim_left - 去除字符串左边的空白字符（包括空格）
+// 返回: 去除左边空白后的字符串
+function trim_left(s)
+{
     len = strlen(s)
     
     if (len == 0)
@@ -750,39 +847,51 @@ function strtrim(s)
         return s
     }
     
-    // 找到第一个非空白字符
-    start = 0
-    while (start < len)
+    // 找到第一个非空白字符的位置
+    first_visible = find_visible_char_atbegin(s)
+    
+    if (first_visible == -1)
     {
-        ch = s[start]
-        if (!isspace(ch))
-        {
-            break
-        }
-        start = start + 1
+        return ""  // 全部是空白字符
     }
     
-    // 如果整个字符串都是空白
-    if (start >= len)
-    {
-        return ""
-    }
-    
-    // 找到最后一个非空白字符
-    end = len - 1
-    while (end >= 0)
-    {
-        ch = s[end]
-        if (!isspace(ch))
-        {
-            break
-        }
-        end = end - 1
-    }
-    
-    // 提取子串
-    return strmid(s, start, end + 1)
+    return strmid(s, first_visible, len)
 }
+
+// trim_right - 去除字符串右边的空白字符（包括空格）
+// 返回: 去除右边空白后的字符串
+function trim_right(s)
+{
+    len = strlen(s)
+    
+    if (len == 0)
+    {
+        return s
+    }
+    
+    // 找到最后一个非空白字符的位置
+    i = len - 1
+    while (i >= 0)
+    {
+        ch = s[i]
+        
+        // 检查是否是可见字符（空格或控制字符）
+        if (is_visible_char(ch)){
+            //msg "第@i@个字符可见"
+            break
+        }
+        //msg "第@i@个字符不可见"
+        i = i - 1
+    }
+    
+    if (i < 0)
+    {
+        return ""  // 全部是空白字符
+    }
+    
+    return strmid(s, 0, i + 1)
+}
+
 
 /***************************************************分界符，以上为C语言string库实现******************************************************/
 function just_line_line_line_line_line_line_line_line1(){}
@@ -969,6 +1078,63 @@ function find_unvisible_char_atend(s)
     {
         ch = s[i]
         if (is_visible_char(ch))
+        {
+            if(first_index==-1){
+                first_index=i
+            }
+            last_index=i+1 //最后一个可见字符位置+1
+        }
+        i = i + 1
+    }
+    
+    return last_index
+
+}
+// find_printable_char_atbegin - 查找第一个打印字符的位置（含空格）
+
+
+// 返回: 索引位置，未找到返回-1
+
+
+
+
+function find_printable_char_atbegin(s)
+{
+    len = strlen(s)
+    first_index=-1
+    last_index=-1
+    i = 0
+    
+    while (i < len)
+    {
+        ch = s[i]
+        if (is_printable_char(ch))
+        {
+            if(first_index==-1){
+                first_index=i
+            }
+            last_index=i
+            break
+        }
+        i = i + 1
+    }
+    
+    return first_index
+}
+
+// find_unprintable_char_atend(s) - 查找最后一个打印字符的后一个位置的索引
+// 返回: 索引位置，未找到返回-1
+function find_unprintable_char_atend(s)
+{
+    len = strlen(s)
+    first_index=-1
+    last_index=-1
+    i = 0
+    
+    while (i < len)
+    {
+        ch = s[i]
+        if (is_printable_char(ch))
         {
             if(first_index==-1){
                 first_index=i
@@ -1772,6 +1938,7 @@ function replace_all(s, old_str, new_str)
     return result
 }
 
+
 /***************************************分界符，以上为字符位置查找函数实现*****  *********************************/
 function just_line_line_line_line_line_line_line_line2(){}
 
@@ -2147,6 +2314,310 @@ function get_CN_char(s, position)
     return ""
 }
 
+
+/*******************************分界符，以上为中英文可见字符位置查找函数实现**  *********************************/
+function just_line_line_line_line_line_line_line_line3(){}
+
+/////////////////////////////////////////////////////////////////////////////
+// 其他相关工具函数
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 相关的工具函数
+/////////////////////////////////////////////////////////////////////////////
+
+// trim_trailing_invisible - 去除末尾的连续不可见字符
+// 返回: 去除末尾不可见字符后的字符串
+function trim_trailing_invisible(s)
+{
+    len = strlen(s)
+    
+    if (len == 0)
+    {
+        return s
+    }
+    
+    // 找到末尾连续不可见字符的开始位置
+    invisible_start = find_unvisible_char_atend(s)
+    
+    if (invisible_start == -1)
+    {
+        return s  // 没有末尾不可见字符
+    }
+    
+    if (invisible_start == 0)
+    {
+        return ""  // 整个字符串都是不可见字符
+    }
+    
+    // 截取从开头到不可见字符开始位置之前的部分
+    return strmid(s, 0, invisible_start)
+}
+
+
+
+// get_trailing_invisible - 获取末尾的连续不可见字符
+// 返回: 末尾连续不可见字符的字符串
+function get_trailing_invisible(s)
+{
+    len = strlen(s)
+    
+    if (len == 0)
+    {
+        return ""
+    }
+    
+    invisible_start = find_unvisible_char_atend(s)
+    
+    if (invisible_start == -1)
+    {
+        return ""  // 没有末尾不可见字符
+    }
+    
+    if (invisible_start >= len)
+    {
+        return ""
+    }
+    
+    return strmid(s, invisible_start, len)
+}
+
+// has_trailing_invisible - 判断是否有末尾连续不可见字符
+// 返回: 1-有，0-没有
+function has_trailing_invisible(s)
+{
+    invisible_start = find_unvisible_char_atend(s)
+    if (invisible_start != -1 && invisible_start < strlen(s))
+    {
+        return 1
+    }
+    return 0
+}
+/***************************************分界符，以下为测试函数*****  *********************************/
+function just_line_line_line_line_line_line_line_line4(){}
+
+/////////////////////////////////////////////////////////////////////////////
+// 测试函数
+/////////////////////////////////////////////////////////////////////////////
+
+// test_trailing_invisible_functions - 测试末尾不可见字符函数
+function test_trailing_invisible_functions()
+{
+    msg "=== 测试末尾不可见字符函数 ==="
+    
+    // 测试用例1：末尾有空格
+    test1 = "Hello World   "
+    msg "测试字符串1: \"" # test1 # "\""
+    msg "字符串长度: " # strlen(test1)
+    
+    invisible_start1 = find_unvisible_char_atend(test1)
+    msg "末尾连续不可见字符开始位置: " # invisible_start1 # " (期望: 11，'d'后面第一个空格)"
+    
+    if (invisible_start1 != -1)
+    {
+        trailing = get_trailing_invisible(test1)
+        msg "末尾不可见字符: \"" # trailing # "\""
+        msg "末尾不可见字符长度: " # strlen(trailing)
+        
+        trimmed = trim_trailing_invisible(test1)
+        msg "去除后: \"" # trimmed # "\""
+        msg "去除后长度: " # strlen(trimmed)
+    }
+    
+    // 测试用例2：末尾有空格和换行符
+    test2 = "Test String  \n\t  "
+    msg "测试字符串2: 显示控制字符"
+    
+    // 显示字符详情
+    i = 0
+    while (i < strlen(test2) && i < 20)
+    {
+        ch = test2[i]
+        ascii = Char2Ascii(ch)
+        if (ascii == 32)
+        {
+            msg "位置 " # i # ": 空格"
+        }
+        else if (ascii == 9)
+        {
+            msg "位置 " # i # ": 制表符(\\t)"
+        }
+        else if (ascii == 10)
+        {
+            msg "位置 " # i # ": 换行符(\\n)"
+        }
+        else if (ascii >= 33 && ascii <= 126)
+        {
+            msg "位置 " # i # ": '" # ch # "'"
+        }
+        i = i + 1
+    }
+    
+    invisible_start2 = find_unvisible_char_atend(test2)
+    msg "末尾连续不可见字符开始位置: " # invisible_start2
+    
+    if (invisible_start2 != -1)
+    {
+        trailing2 = get_trailing_invisible(test2)
+        msg "末尾不可见字符长度: " # strlen(trailing2)
+        
+        trimmed2 = trim_trailing_invisible(test2)
+        msg "去除后: \"" # trimmed2 # "\""
+    }
+    
+    // 测试用例3：没有末尾不可见字符
+    test3 = "No trailing spaces"
+    msg "测试字符串3: \"" # test3 # "\""
+    
+    invisible_start3 = find_unvisible_char_atend(test3)
+    msg "末尾连续不可见字符开始位置: " # invisible_start3 # " (期望: -1，没有)"
+    
+    has_trailing = has_trailing_invisible(test3)
+    msg "是否有末尾不可见字符: " # has_trailing # " (期望: 0)"
+    
+    // 测试用例4：全是不可见字符
+    test4 = "   \t\n  "
+    msg "测试字符串4: 全是不可见字符"
+    
+    invisible_start4 = find_unvisible_char_atend(test4)
+    msg "末尾连续不可见字符开始位置: " # invisible_start4 # " (期望: 0，整个字符串都是)"
+    
+    if (invisible_start4 == 0)
+    {
+        trimmed4 = trim_trailing_invisible(test4)
+        msg "去除后长度: " # strlen(trimmed4) # " (期望: 0)"
+    }
+    
+    // 测试用例5：中英混合，末尾有空格
+    test5 = "Hello 世界！  "
+    msg "测试字符串5: \"" # test5 # "\""
+    
+    invisible_start5 = find_unvisible_char_atend(test5)
+    msg "末尾连续不可见字符开始位置: " # invisible_start5
+    
+    if (invisible_start5 != -1)
+    {
+        ch = test5[invisible_start5]
+        ascii = Char2Ascii(ch)
+        msg "开始位置字符ASCII: " # ascii # " (期望: 32，空格)"
+        
+        trimmed5 = trim_trailing_invisible(test5)
+        msg "去除后: \"" # trimmed5 # "\""
+    }
+    
+    // 测试扩展版本
+    msg "--- 测试扩展版本 ---"
+    test6 = "Text with commas,,,  "
+    msg "测试字符串6: \"" # test6 # "\""
+    
+    // 默认情况：逗号是可见的
+    invisible_start6a = find_unvisible_char_atend(test6)
+    msg "默认 - 末尾连续不可见字符开始位置: " # invisible_start6a
+    
+    
+    msg "=== 末尾不可见字符测试结束 ==="
+}
+
+// quick_test_trailing - 快速测试末尾不可见字符
+function quick_test_trailing()
+{
+    msg "快速测试末尾不可见字符函数:"
+    
+    test_str = "Hello World   \t"
+    msg "测试字符串: 显示控制字符"
+    
+    // 显示字符串
+    i = 0
+    while (i < strlen(test_str))
+    {
+        ch = test_str[i]
+        ascii = Char2Ascii(ch)
+        if (ascii == 32)
+        {
+            msg "位置 " # i # ": 空格"
+        }
+        else if (ascii == 9)
+        {
+            msg "位置 " # i # ": 制表符"
+        }
+        else if (ascii == 10)
+        {
+            msg "位置 " # i # ": 换行符"
+        }
+        else if (ascii >= 33 && ascii <= 126)
+        {
+            msg "位置 " # i # ": '" # ch # "'"
+        }
+        i = i + 1
+    }
+    
+    invisible_start = find_unvisible_char_atend(test_str)
+    msg "末尾连续不可见字符开始位置: " # invisible_start
+    
+    if (invisible_start != -1)
+    {
+        trailing = get_trailing_invisible(test_str)
+        msg "末尾不可见字符长度: " # strlen(trailing)
+        
+        trimmed = trim_trailing_invisible(test_str)
+        msg "去除后: \"" # trimmed # "\""
+        msg "去除后长度: " # strlen(trimmed)
+    }
+    
+    // 测试第一个可见字符
+    first_visible = find_visible_char_atbegin(test_str)
+    msg "第一个可见字符位置（跳过空格）: " # first_visible
+    
+    if (first_visible != -1)
+    {
+        ch = test_str[first_visible]
+        msg "第一个可见字符: '" # ch # "'"
+    }
+}
+
+
+// quick_test_CN - 快速测试中文判断
+function quick_test_CN()
+{
+    msg "快速测试中文判断:"
+    
+    test_str = "Hello 世界！测试123"
+    
+    msg "测试字符串: \"" # test_str # "\""
+    msg "总字节数: " # strlen(test_str)
+    msg "中文字符数: " # count_CN_chars(test_str)
+    
+    // 查找第一个中文
+    first_cn = find_first_CN_char(test_str)
+    msg "第一个中文位置: " # first_cn
+    
+    if (first_cn != -1)
+    {
+        cn_char = get_CN_char(test_str, first_cn)
+        cn_len = is_CN_char(test_str, first_cn)
+        msg "第一个中文: '" # cn_char # "' (长度: " # cn_len # ")"
+    }
+    
+    // 测试各个位置
+    msg "位置判断测试:"
+    pos = 6
+    cn_len = is_CN_char(test_str, pos)
+    if (cn_len > 0)
+    {
+        cn_char = strmid(test_str, pos, pos + cn_len)
+        msg "位置 " # pos # ": 中文 '" # cn_char # "'"
+    }
+    else
+    {
+        msg "位置 " # pos # ": 不是中文"
+    }
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 // ASCII判断函数（保持不变，但更新调用方式）
 /////////////////////////////////////////////////////////////////////////////
@@ -2366,367 +2837,5 @@ function test_encoding_detection()
     }
     
     msg "=== 编码检测测试结束 ==="
-}
-
-// quick_test_CN - 快速测试中文判断
-function quick_test_CN()
-{
-    msg "快速测试中文判断:"
-    
-    test_str = "Hello 世界！测试123"
-    
-    msg "测试字符串: \"" # test_str # "\""
-    msg "总字节数: " # strlen(test_str)
-    msg "中文字符数: " # count_CN_chars(test_str)
-    
-    // 查找第一个中文
-    first_cn = find_first_CN_char(test_str)
-    msg "第一个中文位置: " # first_cn
-    
-    if (first_cn != -1)
-    {
-        cn_char = get_CN_char(test_str, first_cn)
-        cn_len = is_CN_char(test_str, first_cn)
-        msg "第一个中文: '" # cn_char # "' (长度: " # cn_len # ")"
-    }
-    
-    // 测试各个位置
-    msg "位置判断测试:"
-    pos = 6
-    cn_len = is_CN_char(test_str, pos)
-    if (cn_len > 0)
-    {
-        cn_char = strmid(test_str, pos, pos + cn_len)
-        msg "位置 " # pos # ": 中文 '" # cn_char # "'"
-    }
-    else
-    {
-        msg "位置 " # pos # ": 不是中文"
-    }
-}
-
-
-/*******************************分界符，以上为中英文可见字符位置查找函数实现**  *********************************/
-function just_line_line_line_line_line_line_line_line3(){}
-
-/////////////////////////////////////////////////////////////////////////////
-// 其他相关工具函数
-/////////////////////////////////////////////////////////////////////////////
-
-// trim_left - 去除字符串左边的空白字符（包括空格）
-// 返回: 去除左边空白后的字符串
-function trim_left(s)
-{
-    len = strlen(s)
-    
-    if (len == 0)
-    {
-        return s
-    }
-    
-    // 找到第一个非空白字符的位置
-    first_visible = find_visible_char_atbegin(s)
-    
-    if (first_visible == -1)
-    {
-        return ""  // 全部是空白字符
-    }
-    
-    return strmid(s, first_visible, len)
-}
-
-// trim_right - 去除字符串右边的空白字符（包括空格）
-// 返回: 去除右边空白后的字符串
-function trim_right(s)
-{
-    len = strlen(s)
-    
-    if (len == 0)
-    {
-        return s
-    }
-    
-    // 找到最后一个非空白字符的位置
-    i = len - 1
-    while (i >= 0)
-    {
-        ch = s[i]
-        
-        // 检查是否是可见字符（空格或控制字符）
-        if (is_visible_char(ch)){
-            break
-        }
-        i = i - 1
-    }
-    
-    if (i < 0)
-    {
-        return ""  // 全部是空白字符
-    }
-    
-    return strmid(s, 0, i + 1)
-}
-
-// trim - 去除字符串两端的空白字符（包括空格）
-// 返回: 去除两端空白后的字符串
-function trim(s)
-{
-    // 先去除左边空白
-    temp = trim_left(s)
-    // 再去除右边空白
-    return trim_right(temp)
-}
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// 相关的工具函数
-/////////////////////////////////////////////////////////////////////////////
-
-// trim_trailing_invisible - 去除末尾的连续不可见字符
-// 返回: 去除末尾不可见字符后的字符串
-function trim_trailing_invisible(s)
-{
-    len = strlen(s)
-    
-    if (len == 0)
-    {
-        return s
-    }
-    
-    // 找到末尾连续不可见字符的开始位置
-    invisible_start = find_unvisible_char_atend(s)
-    
-    if (invisible_start == -1)
-    {
-        return s  // 没有末尾不可见字符
-    }
-    
-    if (invisible_start == 0)
-    {
-        return ""  // 整个字符串都是不可见字符
-    }
-    
-    // 截取从开头到不可见字符开始位置之前的部分
-    return strmid(s, 0, invisible_start)
-}
-
-
-
-// get_trailing_invisible - 获取末尾的连续不可见字符
-// 返回: 末尾连续不可见字符的字符串
-function get_trailing_invisible(s)
-{
-    len = strlen(s)
-    
-    if (len == 0)
-    {
-        return ""
-    }
-    
-    invisible_start = find_unvisible_char_atend(s)
-    
-    if (invisible_start == -1)
-    {
-        return ""  // 没有末尾不可见字符
-    }
-    
-    if (invisible_start >= len)
-    {
-        return ""
-    }
-    
-    return strmid(s, invisible_start, len)
-}
-
-// has_trailing_invisible - 判断是否有末尾连续不可见字符
-// 返回: 1-有，0-没有
-function has_trailing_invisible(s)
-{
-    invisible_start = find_unvisible_char_atend(s)
-    if (invisible_start != -1 && invisible_start < strlen(s))
-    {
-        return 1
-    }
-    return 0
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// 测试函数
-/////////////////////////////////////////////////////////////////////////////
-
-// test_trailing_invisible_functions - 测试末尾不可见字符函数
-function test_trailing_invisible_functions()
-{
-    msg "=== 测试末尾不可见字符函数 ==="
-    
-    // 测试用例1：末尾有空格
-    test1 = "Hello World   "
-    msg "测试字符串1: \"" # test1 # "\""
-    msg "字符串长度: " # strlen(test1)
-    
-    invisible_start1 = find_unvisible_char_atend(test1)
-    msg "末尾连续不可见字符开始位置: " # invisible_start1 # " (期望: 11，'d'后面第一个空格)"
-    
-    if (invisible_start1 != -1)
-    {
-        trailing = get_trailing_invisible(test1)
-        msg "末尾不可见字符: \"" # trailing # "\""
-        msg "末尾不可见字符长度: " # strlen(trailing)
-        
-        trimmed = trim_trailing_invisible(test1)
-        msg "去除后: \"" # trimmed # "\""
-        msg "去除后长度: " # strlen(trimmed)
-    }
-    
-    // 测试用例2：末尾有空格和换行符
-    test2 = "Test String  \n\t  "
-    msg "测试字符串2: 显示控制字符"
-    
-    // 显示字符详情
-    i = 0
-    while (i < strlen(test2) && i < 20)
-    {
-        ch = test2[i]
-        ascii = Char2Ascii(ch)
-        if (ascii == 32)
-        {
-            msg "位置 " # i # ": 空格"
-        }
-        else if (ascii == 9)
-        {
-            msg "位置 " # i # ": 制表符(\\t)"
-        }
-        else if (ascii == 10)
-        {
-            msg "位置 " # i # ": 换行符(\\n)"
-        }
-        else if (ascii >= 33 && ascii <= 126)
-        {
-            msg "位置 " # i # ": '" # ch # "'"
-        }
-        i = i + 1
-    }
-    
-    invisible_start2 = find_unvisible_char_atend(test2)
-    msg "末尾连续不可见字符开始位置: " # invisible_start2
-    
-    if (invisible_start2 != -1)
-    {
-        trailing2 = get_trailing_invisible(test2)
-        msg "末尾不可见字符长度: " # strlen(trailing2)
-        
-        trimmed2 = trim_trailing_invisible(test2)
-        msg "去除后: \"" # trimmed2 # "\""
-    }
-    
-    // 测试用例3：没有末尾不可见字符
-    test3 = "No trailing spaces"
-    msg "测试字符串3: \"" # test3 # "\""
-    
-    invisible_start3 = find_unvisible_char_atend(test3)
-    msg "末尾连续不可见字符开始位置: " # invisible_start3 # " (期望: -1，没有)"
-    
-    has_trailing = has_trailing_invisible(test3)
-    msg "是否有末尾不可见字符: " # has_trailing # " (期望: 0)"
-    
-    // 测试用例4：全是不可见字符
-    test4 = "   \t\n  "
-    msg "测试字符串4: 全是不可见字符"
-    
-    invisible_start4 = find_unvisible_char_atend(test4)
-    msg "末尾连续不可见字符开始位置: " # invisible_start4 # " (期望: 0，整个字符串都是)"
-    
-    if (invisible_start4 == 0)
-    {
-        trimmed4 = trim_trailing_invisible(test4)
-        msg "去除后长度: " # strlen(trimmed4) # " (期望: 0)"
-    }
-    
-    // 测试用例5：中英混合，末尾有空格
-    test5 = "Hello 世界！  "
-    msg "测试字符串5: \"" # test5 # "\""
-    
-    invisible_start5 = find_unvisible_char_atend(test5)
-    msg "末尾连续不可见字符开始位置: " # invisible_start5
-    
-    if (invisible_start5 != -1)
-    {
-        ch = test5[invisible_start5]
-        ascii = Char2Ascii(ch)
-        msg "开始位置字符ASCII: " # ascii # " (期望: 32，空格)"
-        
-        trimmed5 = trim_trailing_invisible(test5)
-        msg "去除后: \"" # trimmed5 # "\""
-    }
-    
-    // 测试扩展版本
-    msg "--- 测试扩展版本 ---"
-    test6 = "Text with commas,,,  "
-    msg "测试字符串6: \"" # test6 # "\""
-    
-    // 默认情况：逗号是可见的
-    invisible_start6a = find_unvisible_char_atend(test6)
-    msg "默认 - 末尾连续不可见字符开始位置: " # invisible_start6a
-    
-    
-    msg "=== 末尾不可见字符测试结束 ==="
-}
-
-// quick_test_trailing - 快速测试末尾不可见字符
-function quick_test_trailing()
-{
-    msg "快速测试末尾不可见字符函数:"
-    
-    test_str = "Hello World   \t"
-    msg "测试字符串: 显示控制字符"
-    
-    // 显示字符串
-    i = 0
-    while (i < strlen(test_str))
-    {
-        ch = test_str[i]
-        ascii = Char2Ascii(ch)
-        if (ascii == 32)
-        {
-            msg "位置 " # i # ": 空格"
-        }
-        else if (ascii == 9)
-        {
-            msg "位置 " # i # ": 制表符"
-        }
-        else if (ascii == 10)
-        {
-            msg "位置 " # i # ": 换行符"
-        }
-        else if (ascii >= 33 && ascii <= 126)
-        {
-            msg "位置 " # i # ": '" # ch # "'"
-        }
-        i = i + 1
-    }
-    
-    invisible_start = find_unvisible_char_atend(test_str)
-    msg "末尾连续不可见字符开始位置: " # invisible_start
-    
-    if (invisible_start != -1)
-    {
-        trailing = get_trailing_invisible(test_str)
-        msg "末尾不可见字符长度: " # strlen(trailing)
-        
-        trimmed = trim_trailing_invisible(test_str)
-        msg "去除后: \"" # trimmed # "\""
-        msg "去除后长度: " # strlen(trimmed)
-    }
-    
-    // 测试第一个可见字符
-    first_visible = find_visible_char_atbegin(test_str)
-    msg "第一个可见字符位置（跳过空格）: " # first_visible
-    
-    if (first_visible != -1)
-    {
-        ch = test_str[first_visible]
-        msg "第一个可见字符: '" # ch # "'"
-    }
 }
 
