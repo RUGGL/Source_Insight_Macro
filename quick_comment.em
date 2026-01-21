@@ -26,29 +26,29 @@ macro quick_Comment()
 //        msg "开始索引为@first_char@,结束索引为@last_char@"
 
         if(sel.ichFirst == sel.ichLim){
-//情况0.0没有选择代码,默认鼠标所在行
-           mode=00
-
+        //单行，没有选择框
             first_char=find_visible_char_atbegin(firstlnstr) //第一个可见字符的索引位置
             last_char=find_unvisible_char_atend(firstlnstr) //最后一个可见字符的索引位置
             if(first_char==-1 || last_char==-1){ //本行没有可见字符
-                firstlnstr=cat("/*",firstlnstr) 
-                firstlnstr=cat(firstlnstr,"*/") //直接开头末尾加入注释         
-                PutBufLine(hbuf,sel.lnFirst,firstlnstr) //替换原行
-                sel.ichFirst=0 //第一个空格字符的索引位置
-                sel.ichLim=firstlnstrlen+4   //最后一个空格字符的下一索引位置
-                SetWndSel(hwnd,sel)
-                stop
-            } 
+                mode=00
+                //单行，没有选择框,没有可见字符
+                //处理思路,从当前位置插入注释符号
+
+            }else{
+//情况0.0 单行,没有选择框,有可见字符
+                        mode=01 //01模式为处理当前光标位置之后的代码
+
+            }
+            
             
         }else{
-//情况0.1有选择一行内的代码
-            mode=01
+        //单行,有选择框
             firstlnstr_left=strmid(firstlnstr,0,first_char)
             firstlnstr_middle=strmid(firstlnstr,first_char,last_char)
             firstlnstr_right=strmid(firstlnstr,last_char,strlen(firstlnstr))
             if(strlen(strtrim(firstlnstr_middle)) == 0){//所选择范围为空,没有代码
-                
+                mode=02
+//情况 单行,有选择框,内容为空
                 firstlnstr_middle=cat("/*",firstlnstr_middle)
                 firstlnstr_middle=cat(firstlnstr_middle,"*/")
                 firstlnstr=cat(firstlnstr_left,firstlnstr_middle)
@@ -57,6 +57,10 @@ macro quick_Comment()
                 sel.ichLim=sel.ichLim+4   //最后一个空格字符的下一索引位置
                 SetWndSel(hwnd,sel)
                 stop
+            }else{
+//情况0.1  单行,有选择框,不为空
+                mode=03
+
             }
             
        }
@@ -89,8 +93,114 @@ macro quick_Comment()
     } 
 
     if(mode==00){
-        //单行未选择代码模式
+    //单行，未选择代码模式，为空
+    //思路：只涉及注释插入，当前位置到行尾纳入注释范围，插入注释符号，并检查开头缩进
+        first_char=sel.ichFirst
+        last_char=firstlnstrlen
+        firstlnstr_left=strmid(firstlnstr,0,first_char)
+        firstlnstr_right=strmid(firstlnstr,first_char,last_char)
+        
+        firstlnst_right=cat("/*",firstlnstr_right) 
+        firstlnst_right=cat(firstlnst_right,"*/") //直接开头末尾加入注释
+        firstlnstr=cat(firstlnstr_left,firstlnst_right)
+        PutBufLine(hbuf,firstln,firstlnstr) //替换原行
+        
+        sel.ichLim=strlen(firstlnstr)   
+        
+        
+        //检查缩进
+        indentnum_beforeln=getindentbeforeln(firstln)
+        indentnum_afterln=getindentafterln(firstln)
+        indentnum_currentln=getindentln(firstln)
+        maxspacenum=max(indentnum_beforeln,indentnum_afterln)
+        num=maxspacenum-indentnum_currentln //上下行的缩进最大值
+        if(num>0){
+            firstlnstr=cat(makespaceindent(num),firstlnst) //补充空格缩进
+            sel.First=sel.First+num
+            sel.ichLim=sel.ichLim+num
+        }
+        SetWndSel(hwnd,sel)
+        stop
+    
+    }
+    
+    if(mode==01){
+    //单行，未选择代码模式，非空
+    //本模式的处理方式是在当前位置之后部分处理插入注释
+         first_char=sel.ichFirst
+         last_char=firstlnstrlen
 
+         firstlnstr_left=strmid(firstlnstr,0,first_char)
+         firstlnstr_right=strmid(firstlnstr,first_char,last_char)
+         
+         firstlnstr_right_begin=str_get(firstlnstr_right,0,2)
+         firstlnstr_right_end=str_get(firstlnstr_right,0-2,2)
+         if(!strcmp(firstlnstr_right_begin,"/*") && !strcmp(firstlnstr_right_end,"*/")){
+        
+             //如果已有注释,则取消注释
+             //所选第一行开头的前两个非空字符时"/*" 且 最后一行后两个非空字符是 "*/"
+             firstlnstr_right=replace_once_from_begin(firstlnstr_right,"/*","") //开头替换/*为空格
+             firstlnstr_right=replace_once_from_end(firstlnstr_right,"*/","") //结尾替换*/为空格
+        
+             firstlnstr=cat(firstlnstr_left,firstlnstr_right) //重组第一行字符串
+             //msg "单行未选择代码模式,取消注释,firstlnstr为@firstlnstr@"
+             
+             
+             sel.ichFirst=first_char
+             sel.ichLim=last_char-4
+             
+             //检查缩进
+             indentnum_beforeln=getindentbeforeln(firstln)
+             indentnum_afterln=getindentafterln(firstln)
+             indentnum_currentln=getindentln(firstln)
+             maxspacenum=max(indentnum_beforeln,indentnum_afterln)
+             num=maxspacenum-indentnum_currentln //上下行的缩进最大值
+             if(num>0){
+                 firstlnstr=cat(makespaceindent(num),firstlnst) //补充空格缩进
+                 sel.First=sel.First+num
+                 sel.ichLim=sel.ichLim+num
+             }
+             PutBufLine(hbuf,sel.lnFirst,firstlnstr) //替换原行
+             SetWndSel(hwnd,sel)
+             stop
+        
+        
+             
+         }else{
+             //如果没有注释,加注释
+             //msg "第一个可见字符索引为@fisrt_visiblecharindex@,最后一个可见字符索引为@last_visiblecharindex@"
+        
+             firstlnstr_right=cat("/*",firstlnstr_right) 
+             firstlnstr_right=cat(firstlnstr_right,"*/") //直接开头末尾加入注释
+             
+             firstlnstr=cat(firstlnstr_left,firstlnstr_right)
+        
+             sel.ichFirst=first_char
+             sel.ichLim=last_char+4
+        
+        
+//             //检查缩进
+//             indentnum_beforeln=getindentbeforeln(firstln)
+//             indentnum_afterln=getindentafterln(firstln)
+//             indentnum_currentln=getindentln(firstln)
+//             maxspacenum=max(indentnum_beforeln,indentnum_afterln)
+//             num=maxspacenum-indentnum_currentln //上下行的缩进最大值
+//             if(num>0){
+//                 firstlnstr=cat(makespaceindent(num),firstlnst) //补充空格缩进
+//                 sel.First=sel.First+num
+//                 sel.ichLim=sel.ichLim+num
+//             }
+             PutBufLine(hbuf,sel.lnFirst,firstlnstr) //替换原行
+             SetWndSel(hwnd,sel)
+             stop
+        }
+
+    
+    }
+
+    if(mode==04){
+        //单行，未选择代码模式，非空
+        //本模式的处理方式是将整行进行注释、取消注释
 
         firstlnstr_left=strmid(firstlnstr,0,first_char)
         firstlnstr_middle=strmid(firstlnstr,first_char,last_char)
@@ -109,10 +219,27 @@ macro quick_Comment()
             firstlnstr=cat(firstlnstr,firstlnstr_right)    //重组最后一行字符串
             //msg "单行未选择代码模式,取消注释,firstlnstr为@firstlnstr@"
             
-            PutBufLine(hbuf,sel.lnFirst,firstlnstr) //替换选择行
+            
             sel.ichFirst=first_char
             sel.ichLim=last_char-4
-            SetWndSel(hwnd,sel)            
+            
+            //检查缩进
+            indentnum_beforeln=getindentbeforeln(firstln)
+            indentnum_afterln=getindentafterln(firstln)
+            indentnum_currentln=getindentln(firstln)
+            maxspacenum=max(indentnum_beforeln,indentnum_afterln)
+            num=maxspacenum-indentnum_currentln //上下行的缩进最大值
+            if(num>0){
+                firstlnstr=cat(makespaceindent(num),firstlnst) //补充空格缩进
+                sel.First=sel.First+num
+                sel.ichLim=sel.ichLim+num
+            }
+            PutBufLine(hbuf,sel.lnFirst,firstlnstr) //替换原行
+            SetWndSel(hwnd,sel)
+            stop
+
+
+            
         }else{
             //如果没有注释,加注释
             //msg "第一个可见字符索引为@fisrt_visiblecharindex@,最后一个可见字符索引为@last_visiblecharindex@"
@@ -123,17 +250,31 @@ macro quick_Comment()
             firstlnstr=cat(firstlnstr_left,firstlnstr_middle)
             firstlnstr=cat(firstlnstr,firstlnstr_right)
 
-            PutBufLine(hbuf,sel.lnFirst,firstlnstr) //替换原行
+
             sel.ichFirst=first_char
             sel.ichLim=last_char+4
-            SetWndSel(hwnd,sel)
 
-        }
+
+            //检查缩进
+            indentnum_beforeln=getindentbeforeln(firstln)
+            indentnum_afterln=getindentafterln(firstln)
+            indentnum_currentln=getindentln(firstln)
+            maxspacenum=max(indentnum_beforeln,indentnum_afterln)
+            num=maxspacenum-indentnum_currentln //上下行的缩进最大值
+            if(num>0){
+                firstlnstr=cat(makespaceindent(num),firstlnst) //补充空格缩进
+                sel.First=sel.First+num
+                sel.ichLim=sel.ichLim+num
+            }
+            PutBufLine(hbuf,sel.lnFirst,firstlnstr) //替换原行
+            SetWndSel(hwnd,sel)
+            stop
+       }
 
     }
     
-    if(mode==01){
-        //单行选择代码模式
+    if(mode==03){
+        //单行，有选择框，不为空
 
         firstlnstr_middle=strmid(firstlnstr,first_char,last_char)
 
@@ -181,8 +322,6 @@ macro quick_Comment()
             sel.ichFirst=first_char
             sel.ichLim=last_char+4
             SetWndSel(hwnd,sel)
-
-
 
         }
     }
@@ -352,4 +491,109 @@ macro quick_AddMacroComment()
     SetWndSel( hwnd, sel )
 }
 
+//生成空格
+function makespaceindent(n){
+    i=0
+    str=""
+    while(i<n){
+        str=cat(str," ")
+    }
+    return str
+}
+
+//获取当前行的开头缩进,找到返回数量n，找不到返回0
+function getindentln(ln){
+    hbuf=GetCurrentBuf()
+    maxline=GetBufLineCount(hbuf)
+    
+    if(ln<1 || ln>maxline){
+        return 0
+    }
+
+    beforeln=ln-1
+    lnstr = GetBufLine(hbuf,beforeln)
+    len=strlen(lnstr)
+    i=0
+    while(i<len){
+        ch=lnstr[i]
+        if(is_visible_char(ch)){
+            break
+       }
+       i=i+1
+   }
+   
+    num=i
+    if(num>0){
+        return num //第1个可见字符索引号即空格数量
+    }else{
+        return 0
+    }
+}
+
+
+//获取当前行上一行的开头缩进,找到返回数量n，找不到返回0
+function getindentbeforeln(ln){
+    hbuf=GetCurrentBuf()
+    maxline=GetBufLineCount(hbuf)
+    
+    if(ln<1 || ln>maxline){
+        return 0
+    }
+    if(ln==1){
+        return 0
+    }
+    beforeln=ln-1
+    lnstr = GetBufLine(hbuf,beforeln)
+    len=strlen(lnstr)
+    i=0
+    while(i<len){
+     ch=lnstr[i]
+     if(is_visible_char(ch)){
+         break
+    }
+    i=i+1
+    }
+
+    num=i
+    if(num>0){
+     return num //第1个可见字符索引号即空格数量
+    }else{
+     return 0
+    }
+
+}
+
+//获取当前行下一行的开头缩进,找到返回数量n，找不到返回0
+function getindentafterln(ln){
+
+    hbuf=GetCurrentBuf()
+    maxline=GetBufLineCount(hbuf)
+    if(ln<1 || ln>maxline){
+        return 0
+    }
+    if(ln==maxline-1){
+        return 0
+    }
+    
+    afterln=ln+1
+    lnstr = GetBufLine(hbuf,afterln)
+    len=strlen(lnstr)
+    i=0
+    while(i<len){
+     ch=lnstr[i]
+     if(is_visible_char(ch)){
+         break
+    }
+    i=i+1
+    }
+
+    num=i
+    if(num>0){
+     return num //第1个可见字符索引号即空格数量
+    }else{
+     return 0
+    }
+
+
+}
 

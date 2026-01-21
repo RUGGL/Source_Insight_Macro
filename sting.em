@@ -144,7 +144,7 @@ function min(a,b){
 // 取大值函数
 /////////////////////////////////////////////////////////////////////////////
 
-function man(a,b){
+function max(a,b){
     c=a-b
     if(c<0){
         return b
@@ -164,6 +164,7 @@ function man(a,b){
 //   >0 - s1 > s2
 function strcmp(s1, s2)
 {
+/**/
     len1 = strlen(s1)
     len2 = strlen(s2)
     
