@@ -62,27 +62,12 @@ macro quick_Comment()
 //情况1.0
        //选择了多行
        mode=10
-        
-//       firstlnstr_right=strmid(firstlnstr,first_char,strlen(firstlnstr))
-//       lastlnstr_left=strmid(lastlnstr,0,last_char)    
-       
-//        if(strlen(strtrim(firstlnstr_right))==0){//第一行选择范围内为空
-//            //第一行选择为空
-//            //删除第一行末尾空格
-//            lnstr = GetBufLine(hbuf,firstln)
-//            lnstr = trim_right(lnstr)
-//            PutBufLine(hbuf,firstln,lnstr)
-            
-//            //第1行为空，自动修改选择框到下一行
-//            sel.lnFirst=sel.lnFirst+1
-//            firstln=firstln+1
-//            firstlnstr=GetBufLine(hbuf,sel.lnFirst)
-//            sel.ichFirst=0
-//            //sel.ichFirst=find_first_visible_char(firstlnstr)
-//            //sel.ichLim=find_last_visible_char(lastlnstr)+1
-//            SetWndSel(hwnd,sel)
-//        }
-        //更多处理留给下文
+       sel.ichFirst=0
+       first_char=0
+       sel.ichLim=lastlnstrlen //拓展多行选择框到行尾
+       last_char=lastlnstrlen
+       SetWndSel(hwnd,sel)
+
         
     } 
 
