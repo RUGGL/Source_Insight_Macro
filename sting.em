@@ -27,6 +27,10 @@ function just_line_line_line_line_line_line_line_line0(){}
 // string.em - C语言字符串函数实现
 // 基于Source Insight宏语言实现
 
+
+
+
+
 function Char2Ascii(ch){ 
 
     
@@ -127,6 +131,27 @@ function is_visible_char(ch)
     return 1
 
 }
+
+//判断字符的是否包含可见内容,不可见返回0,
+function is_visible_str(s){
+    len=strlen(s)
+    if(len == 0){
+        return 0
+    }
+    
+    i=0
+    while(i<len){
+        ch=s[i]
+        
+        if(is_visible_char(ch)){
+            return 1
+        }
+        
+        i=i+1
+    }
+    return 0
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // 取小值函数
 /////////////////////////////////////////////////////////////////////////////
@@ -849,7 +874,7 @@ function trim_left(s)
     }
     
     // 找到第一个非空白字符的位置
-    first_visible = find_visible_char_atbegin(s)
+    first_visible = find_first_visible_char(s)
     
     if (first_visible == -1)
     {
@@ -1066,15 +1091,18 @@ function find_visible_char_atbegin(s)
     return first_index
 }
 
-// find_unvisible_char_atend(s) - 查找最后一个可见字符的后一个位置的索引
+// find_first_visible_char - 查找第一可见字符的索引（正向）
 // 返回: 索引位置，未找到返回-1
-function find_unvisible_char_atend(s)
+function find_first_visible_char(s)
 {
     len = strlen(s)
     first_index=-1
     last_index=-1
     i = 0
-    
+    if(len<=0){
+        return -1
+    }
+
     while (i < len)
     {
         ch = s[i]
@@ -1083,29 +1111,56 @@ function find_unvisible_char_atend(s)
             if(first_index==-1){
                 first_index=i
             }
-            last_index=i+1 //最后一个可见字符位置+1
+            last_index=i
+            break
         }
         i = i + 1
     }
     
-    return last_index
-
+    return first_index
 }
-// find_printable_char_atbegin - 查找第一个打印字符的位置（含空格）
 
-
+// find_last_visible_char - 查找第一可见字符的索引（正向）
 // 返回: 索引位置，未找到返回-1
+function find_last_visible_char(s)
+{
+    len = strlen(s)
+    first_index=-1
+    last_index=-1
+    if(len<=0){
+        return -1
+    }
+    i = len-1
+    while (i >=0)
+    {
+        ch = s[i]
+        if (is_visible_char(ch))
+        {
+            if(last_index==-1){
+                last_index=i
+            }
+            first_index=i
+            break
+        }
+        i = i -1
+    }
+    
+    return last_index
+}
 
 
-
-
-function find_printable_char_atbegin(s)
+// find_first_printable_char - 查找第一个打印字符的位置（含空格）
+// 返回: 索引位置，未找到返回-1
+function find_first_printable_char(s)
 {
     len = strlen(s)
     first_index=-1
     last_index=-1
     i = 0
-    
+    if(len<=0){
+        return -1
+    }
+
     while (i < len)
     {
         ch = s[i]
@@ -1121,33 +1176,37 @@ function find_printable_char_atbegin(s)
     }
     
     return first_index
-}
 
-// find_unprintable_char_atend(s) - 查找最后一个打印字符的后一个位置的索引
+}
+// find_last_printable_char - 查找最后一个打印字符的位置（含空格）
 // 返回: 索引位置，未找到返回-1
-function find_unprintable_char_atend(s)
+function find_last_printable_char(s)
 {
     len = strlen(s)
     first_index=-1
     last_index=-1
-    i = 0
-    
-    while (i < len)
+    if(len<=0){
+        return -1
+    }
+    i = len-1
+    while (i >=0)
     {
         ch = s[i]
         if (is_printable_char(ch))
         {
-            if(first_index==-1){
-                first_index=i
+            if(last_index==-1){
+                last_index=i
             }
-            last_index=i+1 //最后一个可见字符位置+1
+            first_index=i
+            break
         }
-        i = i + 1
+        i = i -1
     }
-    
     return last_index
-
 }
+
+
+
 
 // find_strln_frombegin - 查找包含指定字符串的行号（正向）
 // 返回: 行号（从1开始），未找到返回-1
@@ -2570,7 +2629,7 @@ function quick_test_trailing()
     }
     
     // 测试第一个可见字符
-    first_visible = find_visible_char_atbegin(test_str)
+    first_visible = find_first_visible_char(test_str)
     msg "第一个可见字符位置（跳过空格）: " # first_visible
     
     if (first_visible != -1)
