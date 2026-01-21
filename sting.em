@@ -64,7 +64,7 @@ function Char2Ascii_CN(ch){
             return ascii_num
         }else if(ascii_num == 0xEF){ //0xEF似乎是中间字节或标点符号开头
             
-            msg "中文中间字节编码@ascii_num@，字符:@ch@"
+            //msg "中文中间字节编码@ascii_num@，字符:@ch@"
             return 129 //0x81
         }else{
 
@@ -2225,7 +2225,7 @@ function count_CN_chars(s)
     len = strlen(s)
     count = 0
     i = 0
-    msg "当前字符串为@s@,长度为@len@"
+    //msg "当前字符串为@s@,长度为@len@"
 
     while (i < len)
     {
@@ -2235,7 +2235,7 @@ function count_CN_chars(s)
 
         if (cn_len > 0)
         {
-            msg "位置@i@开始的字符串是中文,长度@cn_len@,第一个ascii编码为@byte1@,字符为@ch@"
+            //msg "位置@i@开始的字符串是中文,长度@cn_len@,第一个ascii编码为@byte1@,字符为@ch@"
             count = count + 1
             i = i + cn_len
         }
@@ -2584,10 +2584,10 @@ function quick_test_trailing()
 // quick_test_CN - 快速测试中文判断
 function quick_test_CN()
 {
-    msg "快速测试中文判断:"
-    
-    test_str = "Hello 世界！测试123"
-    
+       msg "快速测试中文判断:"
+       /**/
+     test_str = "Hello 世界！测试123"
+     /*  */
     msg "测试字符串: \"" # test_str # "\""
     msg "总字节数: " # strlen(test_str)
     msg "中文字符数: " # count_CN_chars(test_str)
